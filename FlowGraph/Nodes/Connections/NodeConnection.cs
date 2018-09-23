@@ -1,14 +1,14 @@
 ﻿using FlowGraph.Events;
 using FlowGraph.Helpers;
 using FlowGraph.Nodes.Connectors;
+using FlowGraph.Nodes.UserInput;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Windows.Forms;
 
 namespace FlowGraph.Nodes.Connections
 {
-    public class NodeConnection : IElement, IInputHandler
+    public class NodeConnection : IElement, IMouseDoubleClickHandler
     {
         public NodeConnection(NodeConnector from, NodeConnector to)
         {
@@ -93,36 +93,12 @@ namespace FlowGraph.Nodes.Connections
         }
 
         /// <summary>
-        /// Called when this is selected and a the user click
-        /// </summary>
-        public void OnClick(Point mouseLoc)
-        {
-
-        }
-
-        /// <summary>
         /// Called when this item is selected and the user double click
         /// </summary>
-        public void OnDoubleClick(Point mouseLoc)
+        public void OnMouseDoubleClick(Point mouseLoc)
         {
             From?.Disconnect(this);
             To?.Disconnect(this);
-        }
-
-        /// <summary>
-        /// Called when this is selected and a key is pressed
-        /// </summary>
-        public void OnKeyDown(KeyEventArgs e)
-        {
-
-        }
-
-        /// <summary>
-        /// Called when this is selected and a key is released
-        /// </summary>
-        public void OnKeyUp(KeyEventArgs e)
-        {
-
         }
 
         /// <summary>
@@ -130,13 +106,26 @@ namespace FlowGraph.Nodes.Connections
         /// </summary>
         public void OnRender(ElementRenderEventArgs e)
         {
+            /*
             GraphicsPath gPath = RenderHelper.GetLinePath(To.Bounds.X, To.Bounds.Y, From.Bounds.X, From.Bounds.Y).Path;
             Region reg = new Region(gPath);
             Hovered = reg.IsVisible(e.MouseLocation);
             if (Hovered)
                 e.Graphics.DrawPath(HoveredConnectionColor.Pen, gPath);
             else
-                e.Graphics.DrawPath(ConnectionColor.Pen, gPath);
+                e.Graphics.DrawPath(ConnectionColor.Pen, gPath); 
+                */
+            GraphicsPath ggPath = new GraphicsPath();
+            ggPath.AddLine(From.Bounds.X, From.Bounds.Y, From.Bounds.X - 25, From.Bounds.Y);
+            ggPath.AddLine(From.Bounds.X - 25, From.Bounds.Y, To.Bounds.X + 25, To.Bounds.Y);
+            ggPath.AddLine(To.Bounds.X, To.Bounds.Y, To.Bounds.X + 25, To.Bounds.Y);
+            Region reg = new Region(ggPath);
+            Hovered = reg.IsVisible(e.MouseLocation);
+            if (Hovered)
+                e.Graphics.DrawPath(HoveredConnectionColor.Pen, ggPath);
+            else
+                e.Graphics.DrawPath(ConnectionColor.Pen, ggPath);
+
         }
     }
 }

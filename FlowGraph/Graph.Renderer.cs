@@ -15,7 +15,8 @@ namespace FlowGraph
         /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
-            long renderStart = Environment.TickCount;
+            long d_renderStart = DateTime.UtcNow.Ticks;
+
             base.OnPaint(e);
 
             if (e.Graphics == null)
@@ -38,31 +39,38 @@ namespace FlowGraph
             if (m_graphElements.Count > 0)
             {
                 ElementRenderEventArgs renderEvent = new ElementRenderEventArgs(e.Graphics, GetTransformedLocation());
+                m_debugElementsRenderTime = DateTime.UtcNow.Ticks;
                 foreach (IElement element in VisibleElements)
                     element.OnRender(renderEvent);
+                m_debugElementsRenderTime = (DateTime.UtcNow.Ticks - m_debugElementsRenderTime);
             }
 
-            if (EditMode == GraphEditMode.SelectingBox)
+            switch(EditMode)
             {
-                Rectangle selectionRectangle = GetSelectionRectangle();
-                if (FillSelectionRectangle)
-                    e.Graphics.FillRectangle(m_selectionColor.Brush, selectionRectangle);
-                e.Graphics.DrawRectangle(m_outlineSelectionColor.Pen, selectionRectangle);
-            }
-            else if (EditMode == GraphEditMode.Linking)
-            {
-                NodeConnector from = SelectedElement as NodeConnector;
-                if (from != null)
-                    e.Graphics.DrawLine(Pens.Yellow, from.Bounds.X, from.Bounds.Y, m_transformed_location.X, m_transformed_location.Y);
+                case GraphEditMode.SelectingBox:
+                    {
+                        Rectangle selectionRectangle = GetSelectionRectangle();
+                        if (FillSelectionRectangle)
+                            e.Graphics.FillRectangle(m_selectionColor.Brush, selectionRectangle);
+                        e.Graphics.DrawRectangle(m_outlineSelectionColor.Pen, selectionRectangle);
+                    }
+                    break;
+                case GraphEditMode.Linking:
+                    {
+                        NodeConnector from = SelectedElement as NodeConnector;
+                        if (from != null)
+                            e.Graphics.DrawLine(Pens.Yellow, from.Bounds.X, from.Bounds.Y, m_transformed_location.X, m_transformed_location.Y);
+                    }
+                    break;
             }
 
             e.Graphics.SmoothingMode = SmoothingMode.None;
 
-            m_renderTime = (Environment.TickCount - renderStart);
+            m_debugTotalRenderTime = (DateTime.UtcNow.Ticks - d_renderStart);
 
             if (ShowDebugInfos)
             {
-                FrameRate.Call(); //Normally we should call the framerate at the end of a rendering method, but here we want to ignore the debug render time
+                DebugCall();  //we should call the framerate at the end of a rendering method, but here we want to ignore the debug render time
                 OnDrawDebug(e);
             }
         }
@@ -72,10 +80,15 @@ namespace FlowGraph
         /// </summary>
         protected virtual void OnDrawBackground(PaintEventArgs e)
         {
+            m_debugBackgroundRenderTime = DateTime.UtcNow.Ticks;
+
             e.Graphics.Clear(BackColor);
 
             if (!ShowGrid)
+            {
+                m_debugBackgroundRenderTime = (DateTime.UtcNow.Ticks - m_debugBackgroundRenderTime);
                 return;
+            }
 
             PointF[] points = new PointF[] { new PointF(e.ClipRectangle.Left, e.ClipRectangle.Top), new PointF(e.ClipRectangle.Right, e.ClipRectangle.Bottom) };
 
@@ -108,6 +121,8 @@ namespace FlowGraph
                 for (float y = largeYOffset; y < bottom; y += largeStepScaled)
                     e.Graphics.DrawLine(m_largeGridStepColor.Pen, left, y, right, y);
             }
+
+            m_debugBackgroundRenderTime = (DateTime.UtcNow.Ticks - m_debugBackgroundRenderTime);
         }
 
         /// <summary>
@@ -116,12 +131,21 @@ namespace FlowGraph
         private void OnDrawDebug(PaintEventArgs e)
         {
             e.Graphics.Transform = new Matrix();
-            e.Graphics.DrawString($"FPS: {FrameRate.FPS}", DebugFont, Brushes.White, new PointF(0.0f, 0.0f));
-            e.Graphics.DrawString($"Total Render Time: {m_renderTime}ms", DebugFont, Brushes.White, new PointF(0.0f, 15.0f));
-            e.Graphics.DrawString($"Edit Mode: {EditMode}", DebugFont, Brushes.White, new PointF(0.0f, 30.0f));
-            e.Graphics.DrawString($"View Zoom: {Zoom.Zoom.ToString("0.000")}", DebugFont, Brushes.White, new PointF(0.0f, 45.0f));
-            e.Graphics.DrawString($"Elements: {Elements.Count}", DebugFont, Brushes.White, new PointF(0.0f, 60.0f));
-            e.Graphics.DrawString($"Visible Elements: {VisibleElements.Count}", DebugFont, Brushes.White, new PointF(0.0f, 75.0f));
+
+            (string Text, Color Color)[] debugLines = new (string Text, Color Color)[]
+            {
+                ($"FPS: {FPS}", FPS >= 50 ? Color.GreenYellow : FPS >= 30 ? Color.Yellow : Color.Red),
+                ($"Elements Render Time: {ElementsRenderTime.ToString("0.00")}ms", ElementsRenderTime <= 16.66 ? Color.GreenYellow : ElementsRenderTime <= 33.33 ? Color.Yellow : Color.Red),
+                ($"Background Render Time: {BackgroundRenderTime.ToString("0.00")}ms", BackgroundRenderTime <= 16.66 ? Color.GreenYellow : BackgroundRenderTime <= 33.33 ? Color.Yellow : Color.Red),
+                ($"Total Render Time: {TotalRenderTime.ToString("0.00")}ms", TotalRenderTime <= 16.66 ? Color.GreenYellow : TotalRenderTime <= 33.33 ? Color.Yellow : Color.Red),
+                ($"Edit Mode: {EditMode}", Color.GreenYellow),
+                ($"View Zoom: {Zoom.Zoom.ToString("0.00")}", Color.GreenYellow),
+                ($"Elements: {Elements.Count}", Color.GreenYellow),
+                ($"Visible Elements: {VisibleElements.Count}", Color.GreenYellow),
+            };
+
+            for (int i = 0; i < debugLines.Length; i++)
+                TextRenderer.DrawText(e.Graphics, debugLines[i].Text, DebugFont, new Point(0, i * 15), debugLines[i].Color);
         }
 
         /// <summary>

@@ -12,8 +12,9 @@ namespace FlowGraph.Nodes
 
         private List<Node> m_nodes = new List<Node>();
 
-        public NodeGroup()
+        public NodeGroup(Graph graph)
         {
+            Graph = graph;
             UpdateBounds();
         }
 
@@ -21,6 +22,11 @@ namespace FlowGraph.Nodes
         /// Owner, null for this item
         /// </summary>
         public IElement Owner { get; }
+
+        /// <summary>
+        /// Owner graph
+        /// </summary>
+        public Graph Graph { get; }
 
         /// <summary>
         /// Can this element be selected
@@ -33,6 +39,11 @@ namespace FlowGraph.Nodes
         public bool Selected { get; set; } = false;
 
         /// <summary>
+        /// Nodes
+        /// </summary>
+        public Node[] Nodes => m_nodes.ToArray();
+
+        /// <summary>
         /// Header bounds
         /// </summary>
         public Rectangle HeaderBounds { get; private set; }
@@ -41,6 +52,41 @@ namespace FlowGraph.Nodes
         /// Body bounds
         /// </summary>
         public Rectangle Bounds { get; private set; }
+
+        /// <summary>
+        /// Grip Bounds
+        /// </summary>
+        public Rectangle GripBounds { get; private set; }
+
+        /// <summary>
+        /// Header upper left point
+        /// </summary>
+        public Point HeaderUpperLeft { get; private set; }
+
+        /// <summary>
+        /// Header upper right point
+        /// </summary>
+        public Point HeaderUpperRight { get; private set; }
+
+        /// <summary>
+        /// Upper left point
+        /// </summary>
+        public Point UpperLeft { get; private set; }
+
+        /// <summary>
+        /// Upper right point
+        /// </summary>
+        public Point UpperRight { get; private set; }
+
+        /// <summary>
+        /// Lower left point
+        /// </summary>
+        public Point LowerLeft { get; private set; }
+
+        /// <summary>
+        /// Lower right
+        /// </summary>
+        public Point LowerRight { get; private set; }
 
         /// <summary>
         /// Location
@@ -72,21 +118,68 @@ namespace FlowGraph.Nodes
             }
         }
 
+
+        /// <summary>
+        /// Header color
+        /// </summary>
+        public GraphColor HeaderColor { get; set; } = new GraphColor(Color.FromArgb(62, 62, 66));
+
+        /// <summary>
+        /// Header color when this node is selected
+        /// </summary>
+        public GraphColor SelectedHeaderColor { get; set; } = new GraphColor(Color.FromArgb(90, 90, 90));
+
+        /// <summary>
+        /// Background color
+        /// </summary>
+        public GraphColor BackgroundColor { get; set; } = new GraphColor(Color.FromArgb(30, 30, 30));
+
+        /// <summary>
+        /// Background color when this node is selected
+        /// </summary>
+        public GraphColor SelectedBackgroundColor { get; set; } = new GraphColor(Color.FromArgb(60, 60, 60));
+
+        /// <summary>
+        /// Outline color
+        /// </summary>
+        public GraphColor OutlineColor { get; set; } = new GraphColor(Color.FromArgb(0, 0, 0));
+
+        /// <summary>
+        /// Outline color when this node is selected
+        /// </summary>
+        public GraphColor SelectedOutlineColor { get; set; } = new GraphColor(Color.Orange);
+
+        /// <summary>
+        /// Title color
+        /// </summary>
+        public GraphColor TitleColor { get; set; } = new GraphColor(Color.White);
+
+        /// <summary>
+        /// Description color
+        /// </summary>
+        public GraphColor DescriptionColor { get; set; } = new GraphColor(Color.Gray);
+
+        /// <summary>
+        /// Title font
+        /// </summary>
+        public Font TitleFont { get; set; } = SystemFonts.DefaultFont;
+
+        /// <summary>
+        /// Description font
+        /// </summary>
+        public Font DescriptionFont { get; set; } = new Font(new FontFamily(SystemFonts.DefaultFont.Name), 8f, FontStyle.Italic);
+
         internal void UpdateBounds()   // Todo: measure text to avoid out of node string
         {
             Bounds = new Rectangle(Location.X, Location.Y, Size.Width, Size.Height);
             HeaderBounds = new Rectangle(Location.X, Location.Y - 20, Size.Width / 2, 20);
-            /*
-            if (m_nodes.Count > 0)
-            {
-                int itemsHeight = 0;
-                for (int i = 0; i < m_items.Count; i++)
-                {
-                    NodeItem item = m_items[i];
-                    item.UpdateBounds(new GraphLocation(Location.X, (Location.Y + HeaderBounds.Height + itemsHeight) + (ItemsMargin * i)));
-                    itemsHeight += item.Size.Height;
-                }
-            } */
+            HeaderUpperLeft = new Point(HeaderBounds.X, HeaderBounds.Y);
+            HeaderUpperRight = new Point(HeaderBounds.X + HeaderBounds.Width, HeaderBounds.Y);
+            UpperLeft = new Point(Bounds.X, Bounds.Y);
+            UpperRight = new Point(Bounds.X + Bounds.Width, Bounds.Y);
+            LowerLeft = new Point(Bounds.X, Bounds.Y + Bounds.Height);
+            LowerRight = new Point(Bounds.X + Bounds.Width, Bounds.Y + Bounds.Height);
+            GripBounds = new Rectangle(LowerRight.X - 10, LowerRight.Y - 10, 20, 20);
         }
 
         /// <summary>
@@ -104,31 +197,86 @@ namespace FlowGraph.Nodes
                 if (element != null)
                     return element;
             }
-            if (Bounds.Contains(point))
+            if (Bounds.Contains(point) || GripBounds.Contains(point))
                 return this;
             return null;
         }
 
         /// <summary>
+        /// Add a new node into the group
+        /// </summary>
+        /// <param name="node">Node</param>
+        public void AddNode(Node node)
+        {
+            if (!m_nodes.Contains(node))
+            {
+                node.Owner = this;
+                m_nodes.Add(node);
+            }
+        }
+
+        /// <summary>
+        /// Remove the specified node from the group
+        /// </summary>
+        /// <param name="node">Node</param>
+        public void RemoveNode(Node node)
+        {
+            if (m_nodes.Contains(node))
+            {
+                node.Owner = null;
+                m_nodes.Remove(node);
+            }
+        }
+
+        /// <summary>
+        /// Remove a node from the group at a specified index
+        /// </summary>
+        /// <param name="index">Node Index</param>
+        public void RemoveNode(int index)
+        {
+            if (m_nodes.Count <= index)
+            {
+                m_nodes[index].Owner = null;
+                m_nodes.RemoveAt(index);
+            }
+        }
+
+        public void ExpandTo(Point point)
+        {
+            //Size = new GraphSize(Size.Width - point.X, Size.Height - point.Y);
+        }
+
+        /// <summary>
         /// Render this element
         /// </summary>
-        public void OnRender(ElementRenderEventArgs e) //Todo: maybe cache all points in the updatebounds method 
+        public virtual void OnRender(ElementRenderEventArgs e) //Todo: maybe cache all points in the updatebounds method 
         {
-            Point headerUpperLeft = new Point(HeaderBounds.X, HeaderBounds.Y);
-            Point headerUpperRight = new Point(HeaderBounds.X + HeaderBounds.Width, HeaderBounds.Y);
-            Point upperLeft = new Point(Bounds.X, Bounds.Y);
-            Point upperRight = new Point(Bounds.X + Bounds.Width, Bounds.Y);
-            Point lowerLeft = new Point(Bounds.X, Bounds.Y + Bounds.Height);
-            Point lowerRight = new Point(Bounds.X + Bounds.Width, Bounds.Y + Bounds.Height);
+            if (Selected)
+            {
+                e.Graphics.DrawLine(SelectedOutlineColor.Pen, HeaderUpperLeft, HeaderUpperRight);
+                e.Graphics.DrawLine(SelectedOutlineColor.Pen, HeaderUpperLeft, UpperLeft);
+                e.Graphics.DrawLine(SelectedOutlineColor.Pen, HeaderUpperRight.X, HeaderUpperRight.Y, UpperLeft.X + HeaderBounds.Width, UpperLeft.Y);
+                e.Graphics.DrawLine(SelectedOutlineColor.Pen, UpperLeft, LowerLeft);
+                e.Graphics.DrawLine(SelectedOutlineColor.Pen, UpperRight, LowerRight);
+                e.Graphics.DrawLine(SelectedOutlineColor.Pen, LowerLeft, LowerRight);
+                e.Graphics.DrawLine(SelectedOutlineColor.Pen, UpperLeft.X + HeaderBounds.Width, UpperLeft.Y, UpperRight.X, UpperRight.Y);
+                e.Graphics.FillRectangle(SelectedHeaderColor.Brush, HeaderBounds);
+                e.Graphics.FillRectangle(SelectedBackgroundColor.Brush, Bounds);
+            }
+            else
+            {
+                e.Graphics.DrawLine(OutlineColor.Pen, HeaderUpperLeft, HeaderUpperRight);
+                e.Graphics.DrawLine(OutlineColor.Pen, HeaderUpperLeft, UpperLeft);
+                e.Graphics.DrawLine(OutlineColor.Pen, HeaderUpperRight.X, HeaderUpperRight.Y, UpperLeft.X + HeaderBounds.Width, UpperLeft.Y);
+                e.Graphics.DrawLine(OutlineColor.Pen, UpperLeft, LowerLeft);
+                e.Graphics.DrawLine(OutlineColor.Pen, UpperRight, LowerRight);
+                e.Graphics.DrawLine(OutlineColor.Pen, LowerLeft, LowerRight);
+                e.Graphics.DrawLine(OutlineColor.Pen, UpperLeft.X + HeaderBounds.Width, UpperLeft.Y, UpperRight.X, UpperRight.Y);
+                e.Graphics.FillRectangle(HeaderColor.Brush, HeaderBounds);
+                e.Graphics.FillRectangle(BackgroundColor.Brush, Bounds);
+            }
 
-            e.Graphics.DrawLine(Pens.Red, headerUpperLeft, headerUpperRight);
-            e.Graphics.DrawLine(Pens.Red, headerUpperLeft, upperLeft);
-            e.Graphics.DrawLine(Pens.Red, headerUpperRight.X, headerUpperRight.Y, upperLeft.X + HeaderBounds.Width, upperLeft.Y);
-
-            e.Graphics.DrawLine(Pens.Red, upperLeft, lowerLeft);
-            e.Graphics.DrawLine(Pens.Red, upperRight, lowerRight);
-            e.Graphics.DrawLine(Pens.Red, lowerLeft, lowerRight);
-            e.Graphics.DrawLine(Pens.Red, upperLeft.X + HeaderBounds.Width, upperLeft.Y, upperRight.X, upperRight.Y);
+            e.Graphics.DrawRectangle(Pens.Red, GripBounds);
         }
     }
 }

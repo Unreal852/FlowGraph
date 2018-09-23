@@ -1,15 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace FlowGraph
 {
-    public class GraphSelection
+    public class GraphSelection : ICollection<IElement>
     {
         private List<IElement> m_selectedElements = new List<IElement>();
 
-        public GraphSelection()
+        public GraphSelection(Graph graph)
         {
-
+            Graph = graph;
         }
+
+        /// <summary>
+        /// Owner graph
+        /// </summary>
+        public Graph Graph { get; }
 
         /// <summary>
         /// Gets the specified element by index
@@ -29,6 +35,11 @@ namespace FlowGraph
         public int Count => m_selectedElements.Count;
 
         /// <summary>
+        /// Is Read only
+        /// </summary>
+        public bool IsReadOnly => true;
+
+        /// <summary>
         /// Add new element
         /// </summary>
         /// <param name="element">Element</param>
@@ -39,6 +50,7 @@ namespace FlowGraph
             m_selectedElements.Add(element);
             if (!element.Selected)
                 element.Selected = true;
+            //Graph.BringElementToFront(element);
         }
 
         /// <summary>
@@ -80,5 +92,21 @@ namespace FlowGraph
             m_selectedElements.ForEach((IElement element) => element.Selected = false);
             m_selectedElements.Clear();
         }
+
+        public IEnumerator<IElement> GetEnumerator()
+        {
+            return m_selectedElements.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return m_selectedElements.GetEnumerator();
+        }
+
+        public void Add(IElement item) => throw new System.NotImplementedException();
+        public void Clear() => throw new System.NotImplementedException();
+        public bool Contains(IElement item) => throw new System.NotImplementedException();
+        public void CopyTo(IElement[] array, int arrayIndex) => throw new System.NotImplementedException();
+        public bool Remove(IElement item) => throw new System.NotImplementedException();
     }
 }

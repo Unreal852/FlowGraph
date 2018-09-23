@@ -7,6 +7,7 @@ namespace FlowGraph.Nodes.Item.Items
     {
         public LabelItem()
         {
+            Input = new Connectors.NodeConnector(this, Connectors.ConnectorType.Input);
             Output = new Connectors.NodeConnector(this, Connectors.ConnectorType.Output);
         }
 

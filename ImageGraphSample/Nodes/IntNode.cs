@@ -4,6 +4,7 @@ using FlowGraph.Nodes;
 using FlowGraph.Nodes.Connections;
 using FlowGraph.Nodes.Connectors;
 using FlowGraph.Nodes.Item;
+using FlowGraph.Nodes.UserInput;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -18,11 +19,11 @@ namespace ImageGraphSample.Nodes
             Rectangle graphViewRectangle = owner.GetViewRectangle();
             Size = new GraphSize(150, 60);
             Location = new GraphLocation(graphViewRectangle.Width / 2, graphViewRectangle.Height / 2);
-            AddItem(new IntValueItem(ConnectorType.Output) { Size = new GraphSize(Size.Width, 30) });
+            Add(new IntValueItem(ConnectorType.Output) { Size = new GraphSize(Size.Width, 30) });
         }
     }
 
-    public class IntValueItem : NodeItem, IInputHandler, IConnectorHandler
+    public class IntValueItem : NodeItem, IMouseDoubleClickHandler, IConnectorHandler
     {
         public IntValueItem(ConnectorType type)
         {
@@ -55,7 +56,7 @@ namespace ImageGraphSample.Nodes
 
         }
 
-        public void OnDoubleClick(Point mouseLoc)
+        public void OnMouseDoubleClick(Point mouseLoc)
         {
             string input = Microsoft.VisualBasic.Interaction.InputBox("Enter the new int value", "INT VALUE", Value.ToString());
             if (!string.IsNullOrWhiteSpace(input))
@@ -70,16 +71,6 @@ namespace ImageGraphSample.Nodes
         }
 
         public void OnInputValueChanged()
-        {
-
-        }
-
-        public void OnKeyDown(KeyEventArgs e)
-        {
-
-        }
-
-        public void OnKeyUp(KeyEventArgs e)
         {
 
         }

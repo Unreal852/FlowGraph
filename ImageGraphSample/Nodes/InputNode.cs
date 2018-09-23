@@ -17,7 +17,7 @@ namespace ImageGraphSample.Nodes
             Rectangle graphViewRectangle = owner.GetViewRectangle();
             Size = new GraphSize(150, 60);
             Location = new GraphLocation(graphViewRectangle.X + 10, graphViewRectangle.Height / 2);
-            AddItem(new InputImageItem(img) { Size = new GraphSize(Size.Width, 30) });
+            Add(new InputImageItem(img) { Size = new GraphSize(Size.Width, 30) });
         }
     }
 

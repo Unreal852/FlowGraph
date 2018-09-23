@@ -1,6 +1,4 @@
 ﻿using FlowGraph.Nodes;
-using FlowGraph.Nodes.Connectors;
-using FlowGraph.Nodes.Item;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,12 +17,12 @@ namespace FlowGraph
         private float m_smallGridStep = 16.0f;
         private float m_largeGridStep = 16.0f * 8.0f;
 
-        private long m_renderTime;
-
         private bool m_dragElement = false;
 
         private bool m_showGrid = true;
         private bool m_showDebugInfos = true;
+
+        private bool m_timedRedraw = false;
 
         //private Point m_lastLocation;
         private Point m_lastLocation;
@@ -40,12 +38,15 @@ namespace FlowGraph
         private GraphColor m_outlineSelectionColor = new GraphColor(Color.DarkOrange);
         private GraphColor m_linkingColor = new GraphColor(Color.Yellow);
 
+        private Timer m_timedRedrawTimer; // Todo: Create a hight precision timer; this one only use int...
+
         private readonly List<IElement> m_graphElements = new List<IElement>();
 
         public Graph()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.Opaque | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.Selectable | ControlStyles.UserPaint, true);
             BackColor = Color.FromArgb(42, 42, 42);
+            Selection = new GraphSelection(this);
         }
 
         /// <summary>
@@ -55,16 +56,10 @@ namespace FlowGraph
         public GraphZoom Zoom { get; } = new GraphZoom();
 
         /// <summary>
-        /// FrameRate counter
-        /// </summary>
-        [Browsable(false)]
-        public FrameRateCounter FrameRate { get; } = new FrameRateCounter();
-
-        /// <summary>
         /// Graph selection
         /// </summary>
         [Browsable(false)]
-        public GraphSelection Selection { get; } = new GraphSelection();
+        public GraphSelection Selection { get; }
 
         /// <summary>
         /// Edit mode
@@ -133,6 +128,12 @@ namespace FlowGraph
         public int AlignMargin { get; set; } = 15;
 
         /// <summary>
+        /// The interval between each redraw call
+        /// </summary>
+        [Description("The interval between each redraw call")]
+        public double TimedRedrawInterval = 15; // This should be 16.666666
+
+        /// <summary>
         /// Currently selected element
         /// </summary>
         [Browsable(false)]
@@ -151,8 +152,34 @@ namespace FlowGraph
                 foreach (IElement element in m_graphElements)
                     if (viewRectangle.IntersectsWith(element.Bounds))
                         elements.Add(element);
-                elements.Reverse(); // Todo: why reverse ?
+                elements.Reverse();
                 return elements;
+            }
+        }
+
+        /// <summary>
+        /// Enable timed redraw, users actions will not redraw the graph
+        /// </summary>
+        public bool TimedRedraw
+        {
+            get => m_timedRedraw;
+            set
+            {
+                if (m_timedRedraw == value)
+                    return;
+                m_timedRedraw = value;
+                if (value)
+                {
+                    m_timedRedrawTimer = new Timer();
+                    m_timedRedrawTimer.Interval = (int)TimedRedrawInterval;
+                    m_timedRedrawTimer.Tick += (sender, e) => Invalidate();
+                    m_timedRedrawTimer.Start();
+                }
+                else
+                {
+                    m_timedRedrawTimer.Stop();
+                    m_timedRedrawTimer = null;
+                }
             }
         }
 
@@ -168,7 +195,7 @@ namespace FlowGraph
                 if (m_showGrid == value)
                     return;
                 m_showGrid = value;
-                Refresh();
+                Redraw();
             }
         }
 
@@ -184,7 +211,7 @@ namespace FlowGraph
                 if (m_showDebugInfos == value)
                     return;
                 m_showDebugInfos = value;
-                Refresh();
+                Redraw();
             }
         }
 
@@ -200,7 +227,7 @@ namespace FlowGraph
                 if (m_smallGridStep == value)
                     return;
                 m_smallGridStep = value;
-                Refresh();
+                Redraw();
             }
         }
 
@@ -216,7 +243,7 @@ namespace FlowGraph
                 if (m_largeGridStep == value)
                     return;
                 m_largeGridStep = value;
-                Refresh();
+                Redraw();
             }
         }
 
@@ -232,7 +259,7 @@ namespace FlowGraph
                 if (m_smallGridStepColor.Color == value)
                     return;
                 m_smallGridStepColor = new GraphColor(value);
-                Refresh();
+                Redraw();
             }
         }
 
@@ -248,7 +275,7 @@ namespace FlowGraph
                 if (m_largeGridStepColor.Color == value)
                     return;
                 m_largeGridStepColor = new GraphColor(value);
-                Refresh();
+                Redraw();
             }
         }
 
@@ -264,7 +291,7 @@ namespace FlowGraph
                 if (m_selectionColor.Color == value)
                     return;
                 m_selectionColor = new GraphColor(value);
-                Refresh();
+                Redraw();
             }
         }
 
@@ -280,7 +307,7 @@ namespace FlowGraph
                 if (m_outlineSelectionColor.Color == value)
                     return;
                 m_outlineSelectionColor = new GraphColor(value);
-                Refresh();
+                Redraw();
             }
         }
 
@@ -296,7 +323,7 @@ namespace FlowGraph
                 if (m_linkingColor.Color == value)
                     return;
                 m_linkingColor = new GraphColor(value);
-                Refresh();
+                Redraw();
             }
         }
 
@@ -312,7 +339,7 @@ namespace FlowGraph
                 if (m_debugFont == null || m_debugFont == value)
                     return;
                 m_debugFont = value;
-                Refresh();
+                Redraw();
             }
         }
 
@@ -323,7 +350,7 @@ namespace FlowGraph
         public void SetEditMode(GraphEditMode editMode)
         {
             EditMode = editMode;
-            Refresh();
+            Redraw();
         }
 
         /// <summary>
@@ -359,11 +386,41 @@ namespace FlowGraph
         /// <returns><see cref="Point"/> Transformed location</returns>
         public Point GetTransformedLocation()
         {
+            return m_transformed_location;
+            /*
             Point[] points = new Point[] { m_lastLocation };
             InverseTransformation.TransformPoints(points);
             Point transformed_location = points[0];
             // if (abortDrag) transformed_location = originalLocation; 
-            return transformed_location;
+            return transformed_location; */
+        }
+
+        /// <summary>
+        /// Move selected element
+        /// </summary>
+        /// <param name="currentLocation">Current view location</param>
+        /// <param name="element">element to move</param>
+        /// <param name="deltaX">Delta X</param>
+        /// <param name="deltaY">Delta Y</param>
+        private void MoveElement(IElement element, float deltaX, float deltaY)
+        {
+            element.Location = new GraphLocation((int)Math.Round(element.Location.X - deltaX), (int)Math.Round(element.Location.Y - deltaY));
+            if (element is NodeGroup group)
+            {
+                foreach (Node n in group.Nodes)
+                    MoveElement(n, deltaX, deltaY);
+            }
+        }
+
+        /// <summary>
+        /// Move view
+        /// </summary>
+        /// <param name="currentLocation">Current view location</param>
+        /// <param name="x">To X</param>
+        /// <param name="y">To Y</param>
+        private void MoveView(float x, float y)
+        {
+            Zoom.Translation = new PointF((Zoom.Translation.X - x * Zoom.Zoom), (Zoom.Translation.Y - y * Zoom.Zoom));
         }
 
         /// <summary>
@@ -382,6 +439,17 @@ namespace FlowGraph
         }
 
         /// <summary>
+        /// The the transformed location
+        /// </summary>
+        /// <param name="baseLoc">Base location</param>
+        private void SetTransformedLocation(Point baseLoc)
+        {
+            Point[] points = new Point[] { baseLoc };
+            InverseTransformation.TransformPoints(points);
+            m_transformed_location = points[0];
+        }
+
+        /// <summary>
         /// Add a new element
         /// </summary>
         /// <param name="element">Element to add</param>
@@ -393,7 +461,7 @@ namespace FlowGraph
             m_graphElements.Add(element);
             if (select && element.CanBeSelected)
                 Selection.AddElement(element);
-            Refresh();
+            Redraw();
         }
 
         /// <summary>
@@ -405,7 +473,7 @@ namespace FlowGraph
             if (m_graphElements.Contains(element))
             {
                 m_graphElements.Remove(element);
-                Refresh();
+                Redraw();
             }
         }
 
@@ -415,7 +483,17 @@ namespace FlowGraph
         public void ClearElements()
         {
             m_graphElements.Clear();
-            Refresh();
+            Redraw();
+        }
+
+        /// <summary>
+        /// Gets elements
+        /// </summary>
+        /// <param name="onlyVisible">Get only elements that are in the user view</param>
+        /// <returns><see cref="IElement"/> Elements</returns>
+        public IElement[] GetElements(bool onlyVisible)
+        {
+            return (onlyVisible ? VisibleElements : Elements).ToArray();
         }
 
         /// <summary>
@@ -426,13 +504,98 @@ namespace FlowGraph
         /// <returns><see cref="IElement"/> if a element has been found, <see cref="null"/> otherwise</returns>
         public IElement FindElementAt(Point location, bool onlyVisible)
         {
-            foreach (IElement element in onlyVisible ? VisibleElements : Elements)
+            foreach (IElement element in GetElements(onlyVisible))
             {
                 IElement foundElement = element.FindElementAt(location);
                 if (foundElement != null)
                     return foundElement;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Finds element at the specified location that match the given type
+        /// </summary>
+        /// <typeparam name="T">Element Type</typeparam>
+        /// <param name="location">Location to lookup</param>
+        /// <param name="onlyVisible">Only look for user visible element</param>
+        /// <returns><see cref="IElement"/> if a element has been found, <see cref="null"/> otherwise</returns>
+        public IElement FindElementAt<T>(Point location, bool onlyVisible) where T : IElement
+        {
+            foreach (IElement element in GetElements(onlyVisible))
+            {
+                IElement foundElement = element.FindElementAt(location);
+                if (foundElement is T e)
+                    return e;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Finds elements at the specified location
+        /// </summary>
+        /// <param name="location">Location to lookup</param>
+        /// <param name="onlyVisible">Only look for user visible element</param>
+        /// <returns><see cref="IElement[]"/> Elements</returns>
+        public IElement[] FindElementsAt(Point location, bool onlyVisible)
+        {
+            List<IElement> elements = new List<IElement>();
+            foreach (IElement element in GetElements(onlyVisible))
+            {
+                IElement foundElement = element.FindElementAt(location);
+                if (foundElement != null)
+                    elements.Add(foundElement);
+            }
+            return elements.ToArray();
+        }
+
+        /// <summary>
+        /// Finds elements at the specified location that match the given type
+        /// </summary>
+        /// <typeparam name="T">Element Type</typeparam>
+        /// <param name="location">Location to lookup</param>
+        /// <param name="onlyVisible">Only look for user visible element</param>
+        /// <returns><see cref="IElement[]"/> Elements</returns>
+        public IElement[] FindElementsAt<T>(Point location, bool onlyVisible) where T : IElement
+        {
+            List<IElement> elements = new List<IElement>();
+            foreach (IElement element in GetElements(onlyVisible))
+            {
+                IElement foundElement = element.FindElementAt(location);
+                if (foundElement is T e)
+                    elements.Add(e);
+            }
+            return elements.ToArray();
+        }
+
+        /// <summary>
+        /// Selects elements 
+        /// </summary>
+        private void SelectElements()
+        {
+            Rectangle selectRectangle = GetSelectionRectangle();
+            List<IElement> selectedElements = new List<IElement>();
+            foreach (IElement element in m_graphElements)
+            {
+                if (!element.CanBeSelected || element.Owner != null)
+                    continue;
+                if (element.Bounds.IntersectsWith(selectRectangle))
+                    selectedElements.Add(element);
+            }
+            Selection.UnselectAll();
+            Selection.AddElements(selectedElements);
+        }
+
+        /// <summary>
+        /// Call a action on all elements at the specified location
+        /// </summary>
+        /// <param name="location">Location</param>
+        /// <param name="action">Action to execute</param>
+        /// <param name="onlyVisible">Find only visible elements</param>
+        public void CallElementsAt(Point location, Action<IElement> action, bool onlyVisible = true)
+        {
+            foreach (IElement element in FindElementsAt(location, onlyVisible))
+                action(element);
         }
 
         /// <summary>
@@ -443,18 +606,49 @@ namespace FlowGraph
         {
             m_graphElements.Remove(element);
             m_graphElements.Insert(0, element);
-            Refresh();
+            if (element is NodeGroup group)
+            {
+                foreach (Node node in group.Nodes)
+                {
+                    m_graphElements.Remove(node);
+                    m_graphElements.Insert(0, node);
+                }
+            }
+            Redraw();
+        }
+
+        public void Redraw(bool instantly = false)
+        {
+            if (TimedRedraw)
+                return;
+            if (instantly)
+                Refresh();
+            Invalidate();
         }
 
         /// <summary>
-        /// Cast the specified element with the specified type
+        /// Update matrices
         /// </summary>
-        /// <typeparam name="T">Type to cast</typeparam>
-        /// <param name="element">Element</param>
-        /// <returns>Cast</returns>
-        public T GetElementAs<T>(IElement element)
+        private void UpdateMatrices()
         {
-            return (T)element;
+            if (Zoom.Zoom < 0.25f)
+                Zoom.Zoom = 0.25f;
+            if (Zoom.Zoom > 5.00f)
+                Zoom.Zoom = 5.00f;
+
+            PointF center = new PointF(Width / 2.0f, Height / 2.0f);
+
+            Transformation.Reset();
+            Transformation.Translate(Zoom.Translation.X, Zoom.Translation.Y);
+            Transformation.Translate(center.X, center.Y);
+            Transformation.Scale(Zoom.Zoom, Zoom.Zoom);
+            Transformation.Translate(-center.X, -center.Y);
+
+            InverseTransformation.Reset();
+            InverseTransformation.Translate(center.X, center.Y);
+            InverseTransformation.Scale(1.0f / Zoom.Zoom, 1.0f / Zoom.Zoom);
+            InverseTransformation.Translate(-center.X, -center.Y);
+            InverseTransformation.Translate(-Zoom.Translation.X, -Zoom.Translation.Y);
         }
 
         /// <summary>
@@ -505,293 +699,8 @@ namespace FlowGraph
                         }
                         break;
                 }
-                Refresh();
+                Redraw();
             }
-        }
-
-        /// <summary>
-        /// Update matrices
-        /// </summary>
-        private void UpdateMatrices()
-        {
-            if (Zoom.Zoom < 0.25f)
-                Zoom.Zoom = 0.25f;
-            if (Zoom.Zoom > 5.00f)
-                Zoom.Zoom = 5.00f;
-
-            PointF center = new PointF(Width / 2.0f, Height / 2.0f);
-
-            Transformation.Reset();
-            Transformation.Translate(Zoom.Translation.X, Zoom.Translation.Y);
-            Transformation.Translate(center.X, center.Y);
-            Transformation.Scale(Zoom.Zoom, Zoom.Zoom);
-            Transformation.Translate(-center.X, -center.Y);
-
-            InverseTransformation.Reset();
-            InverseTransformation.Translate(center.X, center.Y);
-            InverseTransformation.Scale(1.0f / Zoom.Zoom, 1.0f / Zoom.Zoom);
-            InverseTransformation.Translate(-center.X, -center.Y);
-            InverseTransformation.Translate(-Zoom.Translation.X, -Zoom.Translation.Y);
-        }
-
-        /// <summary>
-        /// Selects elements 
-        /// </summary>
-        private void SelectElements()
-        {
-            Rectangle selectRectangle = GetSelectionRectangle();
-            List<IElement> selectedElements = new List<IElement>();
-            foreach (IElement element in m_graphElements)
-            {
-                if (!element.CanBeSelected)
-                    continue;
-                if (element.Bounds.IntersectsWith(selectRectangle))
-                    selectedElements.Add(element);
-            }
-            Selection.UnselectAll();
-            Selection.AddElements(selectedElements);
-        }
-
-        /// <summary>
-        /// Move selected element
-        /// </summary>
-        /// <param name="currentLocation">Current view location</param>
-        /// <param name="element">element to move</param>
-        /// <param name="deltaX">Delta X</param>
-        /// <param name="deltaY">Delta Y</param>
-        private void MoveElement(IElement element, float deltaX, float deltaY)
-        {
-            element.Location = new GraphLocation((int)Math.Round(element.Location.X - deltaX), (int)Math.Round(element.Location.Y - deltaY));
-        }
-
-        /// <summary>
-        /// Move view
-        /// </summary>
-        /// <param name="currentLocation">Current view location</param>
-        /// <param name="x">To X</param>
-        /// <param name="y">To Y</param>
-        private void MoveView(float x, float y)
-        {
-            Zoom.Translation = new PointF((Zoom.Translation.X - x * Zoom.Zoom), (Zoom.Translation.Y - y * Zoom.Zoom));
-        }
-
-
-        private void SetTransformedLocation(Point baseLoc)
-        {
-            Point[] points = new Point[] { baseLoc };
-            InverseTransformation.TransformPoints(points);
-            m_transformed_location = points[0];
-        }
-
-        /// <summary>
-        /// Handle mouse wheel for zoomin/out
-        /// </summary>
-        protected override void OnMouseWheel(MouseEventArgs e) // Todo: zoom to mouse location
-        {
-            base.OnMouseWheel(e);
-            Zoom.Zoom *= (float)Math.Pow(2, e.Delta / 480.0f);
-            Refresh();
-        }
-
-        /// <summary>
-        /// Handle mouse down
-        /// </summary>
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            base.OnMouseDown(e);
-            m_lastLocation = e.Location;
-            SetTransformedLocation(e.Location);
-            m_originalLocation = m_transformed_location;
-            if (e.Button == MouseButtons.Left)
-            {
-                IElement clickedElement = FindElementAt(Point.Round(m_transformed_location), true);
-                if (clickedElement != null)
-                {
-                    if (clickedElement is IInputHandler)
-                        GetElementAs<IInputHandler>(clickedElement).OnClick(m_transformed_location);
-                    if (clickedElement.CanBeSelected && !clickedElement.Selected)
-                    {
-                        Selection.UnselectAll();
-                        Selection.AddElement(clickedElement);
-                        BringElementToFront(clickedElement);
-                    }
-                    m_dragElement = true;
-                }
-                else
-                {
-                    m_dragElement = false;
-                }
-                SelectedElement = clickedElement;
-                if (SelectedElement != null)
-                    SelectedElement.Selected = true;
-            }
-        }
-
-        /// <summary>
-        /// Handle mouse up
-        /// </summary>
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-            if (e.Button == MouseButtons.Left && EditMode != GraphEditMode.SelectingBox)
-            {
-                IElement clickedElement = FindElementAt(m_transformed_location, true);
-                if (clickedElement != null)
-                {
-                    if (clickedElement is Node)
-                    {
-
-                    }
-                    else if (clickedElement is NodeConnector)
-                    {
-                        NodeConnector from = SelectedElement as NodeConnector;
-                        if (from != null)
-                        {
-                            NodeConnector to = (NodeConnector)clickedElement;
-                            from.Connect(to);
-                            to.Connect(from);
-                        }
-                    }
-                    else
-                        Selection.UnselectAll();
-                }
-                else
-                {
-                    Selection.UnselectAll();
-                }
-            }
-            m_dragElement = false;
-            SetEditMode(GraphEditMode.Idle);
-        }
-
-        /// <summary>
-        /// Handle mouse double click
-        /// </summary>
-        protected override void OnMouseDoubleClick(MouseEventArgs e)
-        {
-            base.OnMouseDoubleClick(e);
-            Point mouseLoc = GetTransformedLocation();
-            IElement element = FindElementAt(mouseLoc, true);
-            if (element is IInputHandler)
-                GetElementAs<IInputHandler>(element).OnDoubleClick(mouseLoc);
-        }
-
-        /// <summary>
-        /// Handle mouse move
-        /// </summary>
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-
-            Point currentLocation = e.Location;
-            SetTransformedLocation(currentLocation);
-
-            float deltaX = (m_lastLocation.X - currentLocation.X) / Zoom.Zoom;
-            float deltaY = (m_lastLocation.Y - currentLocation.Y) / Zoom.Zoom;
-
-            if (e.Button == MouseButtons.Left)
-            {
-                if (SelectedElement is NodeConnector)
-                {
-                    if (EditMode != GraphEditMode.Linking)
-                        SetEditMode(GraphEditMode.Linking);
-                }
-                else
-                {
-                    if (EditMode != GraphEditMode.SelectingBox && EditMode != GraphEditMode.MovingSelection && !m_dragElement)
-                        SetEditMode(GraphEditMode.SelectingBox);
-                    else if (EditMode != GraphEditMode.MovingSelection && EditMode != GraphEditMode.SelectingBox && m_dragElement)
-                        SetEditMode(GraphEditMode.MovingSelection);
-                }
-            }
-            else if (e.Button == MouseButtons.Right)
-            {
-                if (EditMode != GraphEditMode.Scrolling)
-                    SetEditMode(GraphEditMode.Scrolling);
-            }
-            else if (e.Button == MouseButtons.Middle)
-            {
-
-            }
-            else
-            {
-                m_lastLocation = currentLocation;
-                Refresh();
-                return;
-            }
-
-            /*
-            if (EditMode != GraphEditMode.Scrolling && EditMode != GraphEditMode.SelectingBox && e.Button == MouseButtons.Right)
-                SetEditMode(GraphEditMode.Scrolling);
-            else if (EditMode != GraphEditMode.MovingSelection && EditMode != GraphEditMode.SelectingBox && m_dragElement && e.Button == MouseButtons.Left)
-                SetEditMode(GraphEditMode.MovingSelection);
-            else if (EditMode != GraphEditMode.SelectingBox && EditMode != GraphEditMode.MovingSelection && !m_dragElement && e.Button == MouseButtons.Left)
-                SetEditMode(GraphEditMode.SelectingBox);
-            else if(EditMode != GraphEditMode.Linking)
-                SetEditMode(GraphEditMode.Linking); */
-
-            if (Math.Abs(deltaX) > 1 || Math.Abs(deltaY) > 1)
-            {
-                if (EditMode == GraphEditMode.Scrolling)
-                {
-                    MoveView(deltaX, deltaY);
-                    m_lastLocation = currentLocation;
-                    Invalidate();
-                    return;
-                }
-                else if (EditMode == GraphEditMode.SelectingBox)
-                {
-                    SelectElements();
-                    m_lastLocation = currentLocation;
-                    Invalidate();
-                    return;
-                }
-                else if (EditMode == GraphEditMode.MovingSelection)
-                {
-                    foreach (IElement sElement in Selection.Elements)
-                        MoveElement(sElement, deltaX, deltaY);
-                    m_lastLocation = currentLocation;
-                    Invalidate();
-                    return;
-                }
-                else if (EditMode == GraphEditMode.Linking)
-                {
-                    m_lastLocation = currentLocation;
-                    Invalidate();
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Handle key down
-        /// </summary>
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-
-            if (e.KeyCode == Keys.V)
-                AlignElements(Selection.Elements, AlignType.Vertically);
-            else if (e.KeyCode == Keys.H)
-                AlignElements(Selection.Elements, AlignType.Horizontally);
-            else if (e.KeyCode == Keys.D)
-                AlignElements(Selection.Elements, AlignType.Diagonally);
-            else if (e.KeyCode == Keys.G)
-                AddElement(new NodeGroup());
-
-            if (SelectedElement != null && SelectedElement is IInputHandler)
-                GetElementAs<IInputHandler>(SelectedElement).OnKeyDown(e);
-        }
-
-        /// <summary>
-        /// Handle key up
-        /// </summary>
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            base.OnKeyUp(e);
-
-            if (SelectedElement != null && SelectedElement is IInputHandler)
-                GetElementAs<IInputHandler>(SelectedElement).OnKeyUp(e);
         }
     }
 }

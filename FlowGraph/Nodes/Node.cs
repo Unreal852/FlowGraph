@@ -1,13 +1,12 @@
 ﻿using FlowGraph.Events;
 using FlowGraph.Nodes.Item;
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace FlowGraph.Nodes
 {
-    public class Node : IElement
+    public class Node : IElement, ICollection<NodeItem>
     {
         private GraphLocation m_location = new GraphLocation(0, 0);
 
@@ -21,12 +20,12 @@ namespace FlowGraph.Nodes
         }
 
         /// <summary>
-        /// Owner
+        /// Node Owner
         /// </summary>
-        public IElement Owner { get; }
+        public IElement Owner { get; internal set; }
 
         /// <summary>
-        /// Owner graph of this node
+        /// Parent Graph
         /// </summary>
         public Graph Graph { get; }
 
@@ -54,6 +53,16 @@ namespace FlowGraph.Nodes
         /// Can this node be selected
         /// </summary>
         public bool CanBeSelected { get; set; } = true;
+
+        /// <summary>
+        /// Gets the elements count
+        /// </summary>
+        public int Count => m_items.Count;
+
+        /// <summary>
+        /// Is this readonly
+        /// </summary>
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Node tag
@@ -153,7 +162,7 @@ namespace FlowGraph.Nodes
         /// <summary>
         /// Gets the total amounts of all items width/height combined
         /// </summary>
-        /// <returns><see cref="(int Width, int Height)"/> Width and height</returns>
+        /// <returns><see cref="(int Width, int Height)"/> Width and height of all items combined</returns>
         private (int Width, int Height) GetTotalItemsSize()
         {
             int height = 0;
@@ -204,10 +213,10 @@ namespace FlowGraph.Nodes
         }
 
         /// <summary>
-        /// Add new item
+        /// Adds a new item
         /// </summary>
-        /// <param name="item">Item to add</param>
-        public void AddItem(NodeItem item)
+        /// <param name="item"></param>
+        public void Add(NodeItem item)
         {
             item.Location = new GraphLocation(Location.X, (Location.Y + HeaderBounds.Height + GetTotalItemsSize().Height) + (ItemsMargin * m_items.Count));
             item.Owner = this;
@@ -215,6 +224,74 @@ namespace FlowGraph.Nodes
             int totalHeight = (GetTotalItemsSize().Height + (ItemsMargin * m_items.Count) + HeaderBounds.Height);
             if (totalHeight > Bounds.Height)
                 Size = new GraphSize(Bounds.Width, totalHeight);
+        }
+
+        /// <summary>
+        /// Checks if the specified item is contained
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <returns><see cref="true"/> if the item is contained, <see cref="false"/> otherwise</returns>
+        public bool Contains(NodeItem item)
+        {
+            return m_items.Contains(item);
+        }
+
+        /// <summary>
+        /// Copy this into a <see cref="NodeItem[]"/>
+        /// </summary>
+        /// <param name="array">Destination Array</param>
+        /// <param name="arrayIndex">Start Index</param>
+        public void CopyTo(NodeItem[] array, int arrayIndex)
+        {
+            m_items.CopyTo(array, arrayIndex);
+        }
+
+        /// <summary>
+        /// Remove the specified item
+        /// </summary>
+        /// <param name="item">Item to remove</param>
+        /// <returns><see cref="true"/> if the item was removed, <see cref="false"/> otherwise</returns>
+        public bool Remove(NodeItem item)
+        {
+            return m_items.Remove(item);
+        }
+
+        /// <summary>
+        /// Remove a item at the specified index
+        /// </summary>
+        /// <param name="index">Index</param>
+        public void RemoveAt(int index)
+        {
+            if (m_items.Count - 1 < index && index > -1)
+                m_items.RemoveAt(index);
+        }
+
+        /// <summary>
+        /// Clear all items
+        /// </summary>
+        public void Clear()
+        {
+            foreach (NodeItem item in m_items)
+                item.Owner = null;
+            m_items.Clear();
+        }
+
+        /// <summary>
+        /// Return enumerator
+        /// </summary>
+        /// <returns><see cref="IEnumerator{NodeItem}"/></returns>
+        public IEnumerator<NodeItem> GetEnumerator()
+        {
+            return m_items.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Return enumerator
+        /// </summary>
+        /// <returns><see cref="IEnumerator{NodeItem}"/></returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return m_items.GetEnumerator();
         }
 
         /// <summary>
@@ -234,41 +311,13 @@ namespace FlowGraph.Nodes
         /// </summary>
         /// <typeparam name="T">Item type</typeparam>
         /// <returns><see cref="NodeItem[]"/> items</returns>
-        public NodeItem[] GetItems<T>()
+        public T[] GetItems<T>() where T : class
         {
-            List<NodeItem> items = new List<NodeItem>();
+            List<T> items = new List<T>();
             foreach (NodeItem i in m_items)
                 if (i.GetType() == typeof(T))
-                    items.Add(i);
+                    items.Add((i as T));
             return items.ToArray();
-        }
-
-        /// <summary>
-        /// Remove specified item
-        /// </summary>
-        /// <param name="item">Item to remove</param>
-        public void RemoveItem(NodeItem item)
-        {
-            if (m_items.Contains(item))
-                m_items.Remove(item);
-        }
-
-        /// <summary>
-        /// Remove item 
-        /// </summary>
-        /// <param name="index">Index</param>
-        public void RemoveItem(int index)
-        {
-            if (m_items.Count - 1 < index && index > -1)
-                m_items.RemoveAt(index);
-        }
-
-        /// <summary>
-        /// Clear items
-        /// </summary>
-        public void ClearItems()
-        {
-            m_items.Clear();
         }
 
         /// <summary>

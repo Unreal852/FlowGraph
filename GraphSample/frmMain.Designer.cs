@@ -28,18 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.panel1 = new System.Windows.Forms.Panel();
             this.graph1 = new FlowGraph.Graph();
             this.SuspendLayout();
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(37)))), ((int)(((byte)(37)))), ((int)(((byte)(37)))));
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(231, 506);
-            this.panel1.TabIndex = 0;
             // 
             // graph1
             // 
@@ -50,13 +40,15 @@
             this.graph1.FillSelectionRectangle = false;
             this.graph1.LargeGridStep = 128F;
             this.graph1.LargeGridStepColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(26)))));
-            this.graph1.Location = new System.Drawing.Point(231, 0);
+            this.graph1.LinkingColor = System.Drawing.Color.Yellow;
+            this.graph1.Location = new System.Drawing.Point(0, 0);
             this.graph1.Name = "graph1";
             this.graph1.OutlineSelectionColor = System.Drawing.Color.DarkOrange;
+            this.graph1.SelectedElement = null;
             this.graph1.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(128)))), ((int)(((byte)(90)))), ((int)(((byte)(30)))));
             this.graph1.ShowDebugInfos = false;
             this.graph1.ShowGrid = true;
-            this.graph1.Size = new System.Drawing.Size(1018, 506);
+            this.graph1.Size = new System.Drawing.Size(1249, 506);
             this.graph1.SmallGridStep = 16F;
             this.graph1.SmallGridStepColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(54)))), ((int)(((byte)(54)))));
             this.graph1.TabIndex = 1;
@@ -69,7 +61,6 @@
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(1249, 506);
             this.Controls.Add(this.graph1);
-            this.Controls.Add(this.panel1);
             this.Name = "frmMain";
             this.Text = "Graph Sample";
             this.ResumeLayout(false);
@@ -77,8 +68,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel panel1;
         private FlowGraph.Graph graph1;
     }
 }

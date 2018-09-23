@@ -1,6 +1,5 @@
 ﻿using FlowGraph.Events;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace FlowGraph
 {

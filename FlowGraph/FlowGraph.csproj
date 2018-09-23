@@ -44,12 +44,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlignType.cs" />
+    <Compile Include="EGrip.cs" />
     <Compile Include="Events\ElementRenderEventArgs.cs" />
     <Compile Include="Events\NodeAddedEventArgs.cs" />
     <Compile Include="Events\NodeRemovedEventArgs.cs" />
+    <Compile Include="Extenders\ElementExts.cs" />
     <Compile Include="Extenders\GraphicsExts.cs" />
     <Compile Include="Extenders\RectangleExts.cs" />
-    <Compile Include="FrameRateCounter.cs" />
+    <Compile Include="Graph.Debug.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Graph.Events.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GraphEditMode.cs" />
     <Compile Include="Graph.cs">
       <SubType>Component</SubType>
@@ -64,7 +71,8 @@
     <Compile Include="GraphZoom.cs" />
     <Compile Include="Helpers\RenderHelper.cs" />
     <Compile Include="IElement.cs" />
-    <Compile Include="IInputHandler.cs" />
+    <Compile Include="IExpandableElement.cs" />
+    <Compile Include="IGraphChild.cs" />
     <Compile Include="Nodes\Compatibility\ICompatibility.cs" />
     <Compile Include="Nodes\Connectors\ConnectorType.cs" />
     <Compile Include="Nodes\Connectors\IConnectorHandler.cs" />
@@ -74,8 +82,17 @@
     <Compile Include="Nodes\Connectors\NodeConnector.cs" />
     <Compile Include="Nodes\Item\NodeItem.cs" />
     <Compile Include="Nodes\NodeGroup.cs" />
+    <Compile Include="Nodes\UserInput\IInputHandler.cs" />
+    <Compile Include="Nodes\UserInput\IKeyUpHandler.cs" />
+    <Compile Include="Nodes\UserInput\IMouseDoubleClickHandler.cs" />
+    <Compile Include="Nodes\UserInput\IKeyDownHandler.cs" />
+    <Compile Include="Nodes\UserInput\IMouseWheelHandler.cs" />
+    <Compile Include="Nodes\UserInput\IMouseUpHandler.cs" />
+    <Compile Include="Nodes\UserInput\IMouseDownHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Nodes\UserInput\Events\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -18,13 +18,13 @@ namespace ImageGraphSample.Nodes
             Rectangle graphViewRectangle = owner.GetViewRectangle();
             Size = new GraphSize(150, 60);
             Location = new GraphLocation(graphViewRectangle.Width / 2, graphViewRectangle.Height / 2);
-            AddItem(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
-            AddItem(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
-            AddItem(new MergeInputItem() { Size = new GraphSize(Size.Width, 30) });
-            AddItem(new MergeOutputItem() { Size = new GraphSize(Size.Width, 1) });
-            AddItem(new MergeInputItem() { Size = new GraphSize(Size.Width, 30) });
-            AddItem(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
-            AddItem(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
+            Add(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
+            Add(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
+            Add(new MergeInputItem() { Size = new GraphSize(Size.Width, 30) });
+            Add(new MergeOutputItem() { Size = new GraphSize(Size.Width, 1) });
+            Add(new MergeInputItem() { Size = new GraphSize(Size.Width, 30) });
+            Add(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
+            Add(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 20) });
         }
     }
 

@@ -7,27 +7,32 @@ namespace GraphSample
 {
     public partial class frmMain : Form
     {
+        private Timer m_timer;
+
         public frmMain()
         {
             InitializeComponent();
 
             graph1.ShowDebugInfos = true;
             graph1.ShowGrid = true;
-            
+            graph1.TimedRedraw = true;
 
             Random rnd = new Random();
 
-            for(int i = 1; i != 10; i++)
+            int nodeY = 20;
+            for (int i = 0; i < 3; i++)
             {
-                Node node = new Node(graph1);
-                node.Title = "Test Node";
-                node.Description = "Actor Test";
-                node.Location = new FlowGraph.GraphLocation(rnd.Next(1, 1000 * i), rnd.Next(1, 1000 * i));
-                node.AddItem(new LabelItem() {  Size = new FlowGraph.GraphSize(node.Size.Width, 30)});
-                node.AddItem(new LabelItem() { Size = new FlowGraph.GraphSize(node.Size.Width, 30) });
-                node.AddItem(new LabelItem() { Size = new FlowGraph.GraphSize(node.Size.Width, 30) });
-                graph1.AddElement(node, rnd.Next(0, 10) < 5 ? true : false);
+                nodeY += 20;
+                Node node = new Node(graph1) { Location = new FlowGraph.GraphLocation(0, nodeY), Title = "Test" };
+                node.Add(new LabelItem() { Size = new FlowGraph.GraphSize(node.Size.Width, 30) });
+                graph1.AddElement(node);
             }
+
+            NodeGroup group = new NodeGroup(graph1);
+            group.Location = new FlowGraph.GraphLocation(0, 0);
+            group.Size = new FlowGraph.GraphSize(1000, 700);
+
+            graph1.AddElement(group);
         }
     }
 }

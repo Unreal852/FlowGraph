@@ -18,9 +18,9 @@ namespace ImageGraphSample.Nodes
             Rectangle graphViewRectangle = owner.GetViewRectangle();
             Location = new GraphLocation(graphViewRectangle.Width / 2, graphViewRectangle.Height / 2);
             Size = new GraphSize(250, 100);
-            AddItem(new ResizeImageItem() { Size = new GraphSize(Size.Width, 30) });
-            AddItem(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 30) });
-            AddItem(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 30) });
+            Add(new ResizeImageItem() { Size = new GraphSize(Size.Width, 30) });
+            Add(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 30) });
+            Add(new IntValueItem(ConnectorType.Input) { Size = new GraphSize(Size.Width, 30) });
         }
     }
 

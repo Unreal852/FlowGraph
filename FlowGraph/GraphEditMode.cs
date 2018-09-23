@@ -29,6 +29,10 @@
         /// <summary>
         /// Linking elements
         /// </summary>
-        Linking
+        Linking,
+        /// <summary>
+        /// Expanding a node group
+        /// </summary>
+        ExpandingGroup
     }
 }
