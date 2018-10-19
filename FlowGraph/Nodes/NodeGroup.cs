@@ -1,10 +1,11 @@
 ﻿using FlowGraph.Events;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace FlowGraph.Nodes
 {
-    public class NodeGroup : IElement
+    public class NodeGroup : IExpandableElement //Todo: When expanding the group, child elements are still visible even if they are outbounds... Maybe change the rendering order for elements thats got a parent
     {
         private GraphLocation m_location = new GraphLocation(0, 0);
 
@@ -54,9 +55,19 @@ namespace FlowGraph.Nodes
         public Rectangle Bounds { get; private set; }
 
         /// <summary>
-        /// Grip Bounds
+        /// Right grip bounds
         /// </summary>
-        public Rectangle GripBounds { get; private set; }
+        public Rectangle RightGripBounds { get; private set; }
+
+        /// <summary>
+        /// Bottom grip bounds
+        /// </summary>
+        public Rectangle BottomGripBounds { get; private set; }
+
+        /// <summary>
+        /// Bottom right grip bounds
+        /// </summary>
+        public Rectangle BottomRightGripBounds { get; private set; }
 
         /// <summary>
         /// Header upper left point
@@ -113,11 +124,24 @@ namespace FlowGraph.Nodes
             {
                 if (m_size == value || (m_size.Width == value.Width && m_size.Height == value.Height))
                     return;
+                if (value > MaxSize)
+                    value = new GraphSize(Math.Min(value.Width, MaxSize.Width), Math.Min(value.Height, MaxSize.Height));
+                if (value < MinSize)
+                    value = new GraphSize(Math.Max(value.Width, MinSize.Width), Math.Max(value.Height, MinSize.Height));
                 m_size = value;
                 UpdateBounds();
             }
         }
 
+        /// <summary>
+        /// Minimum size
+        /// </summary>
+        public GraphSize MinSize { get; } = new GraphSize(100, 50);
+
+        /// <summary>
+        /// Maximum size
+        /// </summary>
+        public GraphSize MaxSize { get; } = new GraphSize(10000, 10000);
 
         /// <summary>
         /// Header color
@@ -179,7 +203,9 @@ namespace FlowGraph.Nodes
             UpperRight = new Point(Bounds.X + Bounds.Width, Bounds.Y);
             LowerLeft = new Point(Bounds.X, Bounds.Y + Bounds.Height);
             LowerRight = new Point(Bounds.X + Bounds.Width, Bounds.Y + Bounds.Height);
-            GripBounds = new Rectangle(LowerRight.X - 10, LowerRight.Y - 10, 20, 20);
+            BottomRightGripBounds = new Rectangle(LowerRight.X - 10, LowerRight.Y - 10, 20, 20);
+            BottomGripBounds = new Rectangle(LowerLeft.X, LowerRight.Y - 10, Size.Width - 10, 20);
+            RightGripBounds = new Rectangle(UpperRight.X - 10, UpperRight.Y, 20, Size.Height - 10);
         }
 
         /// <summary>
@@ -197,7 +223,7 @@ namespace FlowGraph.Nodes
                 if (element != null)
                     return element;
             }
-            if (Bounds.Contains(point) || GripBounds.Contains(point))
+            if (Bounds.Contains(point) || this.IsInAnyGrip(point))
                 return this;
             return null;
         }
@@ -275,8 +301,6 @@ namespace FlowGraph.Nodes
                 e.Graphics.FillRectangle(HeaderColor.Brush, HeaderBounds);
                 e.Graphics.FillRectangle(BackgroundColor.Brush, Bounds);
             }
-
-            e.Graphics.DrawRectangle(Pens.Red, GripBounds);
         }
     }
 }

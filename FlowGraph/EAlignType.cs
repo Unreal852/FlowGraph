@@ -1,6 +1,6 @@
 ﻿namespace FlowGraph
 {
-    public enum AlignType
+    public enum EAlignType
     {
         /// <summary>
         /// Align vertically

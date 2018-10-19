@@ -14,7 +14,7 @@ namespace GraphSample
             InitializeComponent();
 
             graph1.ShowDebugInfos = true;
-            graph1.ShowGrid = true;
+            graph1.ShowGrid = false;
             graph1.TimedRedraw = true;
 
             Random rnd = new Random();

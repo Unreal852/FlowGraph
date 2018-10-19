@@ -6,6 +6,10 @@ namespace FlowGraph
     public enum EGrip
     {
         /// <summary>
+        /// None..
+        /// </summary>
+        None,
+        /// <summary>
         /// Left grip
         /// </summary>
         Left,
@@ -20,6 +24,10 @@ namespace FlowGraph
         /// <summary>
         /// Bottom grip
         /// </summary>
-        Bottom
+        Bottom,
+        /// <summary>
+        /// Bottom right corner
+        /// </summary>
+        BottomRight
     }
 }

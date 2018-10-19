@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FlowGraph
 {
-    public class GraphSelection : ICollection<IElement>
+    public class GraphSelection : IGraphChild, ICollection<IElement>
     {
         private List<IElement> m_selectedElements = new List<IElement>();
 
@@ -50,7 +50,7 @@ namespace FlowGraph
             m_selectedElements.Add(element);
             if (!element.Selected)
                 element.Selected = true;
-            //Graph.BringElementToFront(element);
+            Graph.BringElementToFront(element);
         }
 
         /// <summary>

@@ -43,11 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlignType.cs" />
+    <Compile Include="EAlignType.cs" />
     <Compile Include="EGrip.cs" />
     <Compile Include="Events\ElementRenderEventArgs.cs" />
     <Compile Include="Events\NodeAddedEventArgs.cs" />
     <Compile Include="Events\NodeRemovedEventArgs.cs" />
+    <Compile Include="Extenders\EGripExts.cs" />
     <Compile Include="Extenders\ElementExts.cs" />
     <Compile Include="Extenders\GraphicsExts.cs" />
     <Compile Include="Extenders\RectangleExts.cs" />
@@ -57,7 +58,7 @@
     <Compile Include="Graph.Events.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="GraphEditMode.cs" />
+    <Compile Include="EGraphEditMode.cs" />
     <Compile Include="Graph.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -92,6 +93,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Menus\" />
     <Folder Include="Nodes\UserInput\Events\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

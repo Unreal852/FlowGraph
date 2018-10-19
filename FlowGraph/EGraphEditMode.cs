@@ -1,6 +1,6 @@
 ﻿namespace FlowGraph
 {
-    public enum GraphEditMode
+    public enum EGraphEditMode
     {
         /// <summary>
         /// Idle
@@ -31,8 +31,16 @@
         /// </summary>
         Linking,
         /// <summary>
-        /// Expanding a node group
+        /// Expanding a expendable element to the bottom
         /// </summary>
-        ExpandingGroup
+        ExpandingBottom,
+        /// <summary>
+        /// Expanding a expendable element to the right
+        /// </summary>
+        ExpandingRight,
+        /// <summary>
+        /// Expanding a expendable element to the bottom right
+        /// </summary>
+        ExpandingBottomRight,
     }
 }

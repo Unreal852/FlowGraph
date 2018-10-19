@@ -62,7 +62,7 @@ namespace FlowGraph
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            if (e.Button == MouseButtons.Left && EditMode != GraphEditMode.SelectingBox)
+            if (e.Button == MouseButtons.Left && EditMode != EGraphEditMode.SelectingBox)
             {
                 IElement clickedElement = FindElementAt(m_transformed_location, true);
                 if (clickedElement != null)
@@ -107,7 +107,7 @@ namespace FlowGraph
                 }
             }
             m_dragElement = false;
-            SetEditMode(GraphEditMode.Idle);
+            SetEditMode(EGraphEditMode.Idle);
         }
 
         /// <summary>
@@ -138,27 +138,44 @@ namespace FlowGraph
 
             if (e.Button == MouseButtons.Left)
             {
-                if (SelectedElement is NodeConnector)
+                if (EditMode == EGraphEditMode.Idle)
                 {
-                    if (EditMode != GraphEditMode.Linking)
-                        SetEditMode(GraphEditMode.Linking);
-                }
-                else if (SelectedElement is IExpandableElement expandableElement && group.GripBounds.Contains(m_transformed_location))
-                {
-                    SetEditMode(GraphEditMode.ExpandingGroup);
-                }
-                else
-                {
-                    if (EditMode != GraphEditMode.SelectingBox && EditMode != GraphEditMode.MovingSelection && !m_dragElement)
-                        SetEditMode(GraphEditMode.SelectingBox);
-                    else if (EditMode != GraphEditMode.ExpandingGroup && EditMode != GraphEditMode.MovingSelection && EditMode != GraphEditMode.SelectingBox && m_dragElement)
-                        SetEditMode(GraphEditMode.MovingSelection);
+                    if (SelectedElement is NodeConnector)
+                    {
+                        if (EditMode != EGraphEditMode.Linking)
+                            SetEditMode(EGraphEditMode.Linking);
+                    }
+                    else if (SelectedElement is IExpandableElement expandableElement && expandableElement.IsInAnyGrip(m_transformed_location))
+                    {
+                        switch (expandableElement.GetCurrentGrip(m_transformed_location))
+                        {
+                            case EGrip.Bottom:
+                                SetEditMode(EGraphEditMode.ExpandingBottom);
+                                break;
+                            case EGrip.BottomRight:
+                                SetEditMode(EGraphEditMode.ExpandingBottomRight);
+                                break;
+                            case EGrip.Right:
+                                SetEditMode(EGraphEditMode.ExpandingRight);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        if (!m_dragElement)
+                            SetEditMode(EGraphEditMode.SelectingBox);
+                        else if (m_dragElement)
+                            SetEditMode(EGraphEditMode.MovingSelection);
+                    }
                 }
             }
             else if (e.Button == MouseButtons.Right)
             {
-                if (EditMode != GraphEditMode.Scrolling)
-                    SetEditMode(GraphEditMode.Scrolling);
+                if (EditMode == EGraphEditMode.Idle)
+                {
+                    if (EditMode != EGraphEditMode.Scrolling)
+                        SetEditMode(EGraphEditMode.Scrolling);
+                }
             }
             else if (e.Button == MouseButtons.Middle)
             {
@@ -166,40 +183,48 @@ namespace FlowGraph
             }
             else
             {
+                IElement element = FindElementAt(m_transformed_location, true);
+                if (element is IExpandableElement expandableElement)
+                {
+                    switch(expandableElement.GetCurrentGrip(m_transformed_location))
+                    {
+                        case EGrip.BottomRight:
+                            Cursor.Current = Cursors.SizeNWSE;
+                            break;
+                        case EGrip.Right:
+                            Cursor.Current = Cursors.SizeWE;
+                            break;
+                        case EGrip.Bottom:
+                            Cursor.Current = Cursors.SizeNS;
+                            break;
+                    }
+                }
+                else
+                    Cursor.Current = Cursors.Default;
                 m_lastLocation = currentLocation;
                 Redraw();
                 return;
             }
 
-            /*
-            if (EditMode != GraphEditMode.Scrolling && EditMode != GraphEditMode.SelectingBox && e.Button == MouseButtons.Right)
-                SetEditMode(GraphEditMode.Scrolling);
-            else if (EditMode != GraphEditMode.MovingSelection && EditMode != GraphEditMode.SelectingBox && m_dragElement && e.Button == MouseButtons.Left)
-                SetEditMode(GraphEditMode.MovingSelection);
-            else if (EditMode != GraphEditMode.SelectingBox && EditMode != GraphEditMode.MovingSelection && !m_dragElement && e.Button == MouseButtons.Left)
-                SetEditMode(GraphEditMode.SelectingBox);
-            else if(EditMode != GraphEditMode.Linking)
-                SetEditMode(GraphEditMode.Linking); */
-
             if (Math.Abs(deltaX) > 1 || Math.Abs(deltaY) > 1)
             {
                 switch (EditMode)
                 {
-                    case GraphEditMode.Scrolling:
+                    case EGraphEditMode.Scrolling:
                         {
                             MoveView(deltaX, deltaY);
                             m_lastLocation = currentLocation;
                             Redraw();
                         }
                         break;
-                    case GraphEditMode.SelectingBox:
+                    case EGraphEditMode.SelectingBox:
                         {
                             SelectElements();
                             m_lastLocation = currentLocation;
                             Redraw();
                         }
                         break;
-                    case GraphEditMode.MovingSelection:
+                    case EGraphEditMode.MovingSelection:
                         {
                             foreach (IElement sElement in Selection.Elements)
                                 MoveElement(sElement, deltaX, deltaY);
@@ -207,17 +232,41 @@ namespace FlowGraph
                             Redraw();
                         }
                         break;
-                    case GraphEditMode.Linking:
+                    case EGraphEditMode.Linking:
                         {
                             m_lastLocation = currentLocation;
                             Redraw();
                         }
                         break;
-                    case GraphEditMode.ExpandingGroup:
+                    case EGraphEditMode.ExpandingBottomRight:
                         {
-                            NodeGroup group = SelectedElement.As<NodeGroup>();
-                            group.Size = new GraphSize((int)(m_transformed_location.X - group.Location.X), (int)(m_transformed_location.Y - group.Location.Y));
-                            //SelectedElement.As<NodeGroup>()?.ExpandTo(currentLocation);
+                            if (SelectedElement is IExpandableElement expandableElement)
+                            {
+                                Cursor.Current = Cursors.SizeNWSE;
+                                expandableElement.Size = new GraphSize((m_transformed_location.X - expandableElement.Location.X), (m_transformed_location.Y - expandableElement.Location.Y));
+                            }
+                            m_lastLocation = currentLocation;
+                            Redraw();
+                        }
+                        break;
+                    case EGraphEditMode.ExpandingRight:
+                        {
+                            if (SelectedElement is IExpandableElement expandableElement)
+                            {
+                                Cursor.Current = Cursors.SizeWE;
+                                expandableElement.Size = new GraphSize((m_transformed_location.X - expandableElement.Location.X), expandableElement.Size.Height);
+                            }
+                            m_lastLocation = currentLocation;
+                            Redraw();
+                        }
+                        break;
+                    case EGraphEditMode.ExpandingBottom:
+                        {
+                            if (SelectedElement is IExpandableElement expandableElement)
+                            {
+                                Cursor.Current = Cursors.SizeNS;
+                                expandableElement.Size = new GraphSize(expandableElement.Size.Width, (m_transformed_location.Y - expandableElement.Location.Y));
+                            }
                             m_lastLocation = currentLocation;
                             Redraw();
                         }
@@ -234,11 +283,11 @@ namespace FlowGraph
             base.OnKeyDown(e);
 
             if (e.KeyCode == Keys.V)
-                AlignElements(Selection.Elements, AlignType.Vertically);
+                AlignElements(Selection.Elements, EAlignType.Vertically);
             else if (e.KeyCode == Keys.H)
-                AlignElements(Selection.Elements, AlignType.Horizontally);
+                AlignElements(Selection.Elements, EAlignType.Horizontally);
             else if (e.KeyCode == Keys.D)
-                AlignElements(Selection.Elements, AlignType.Diagonally);
+                AlignElements(Selection.Elements, EAlignType.Diagonally);
             else if (e.KeyCode == Keys.G)
                 AddElement(new NodeGroup(this));
 

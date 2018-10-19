@@ -119,6 +119,7 @@ namespace FlowGraph.Nodes.Connections
             ggPath.AddLine(From.Bounds.X, From.Bounds.Y, From.Bounds.X - 25, From.Bounds.Y);
             ggPath.AddLine(From.Bounds.X - 25, From.Bounds.Y, To.Bounds.X + 25, To.Bounds.Y);
             ggPath.AddLine(To.Bounds.X, To.Bounds.Y, To.Bounds.X + 25, To.Bounds.Y);
+            
             Region reg = new Region(ggPath);
             Hovered = reg.IsVisible(e.MouseLocation);
             if (Hovered)

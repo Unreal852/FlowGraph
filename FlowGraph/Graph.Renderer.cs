@@ -47,7 +47,7 @@ namespace FlowGraph
 
             switch(EditMode)
             {
-                case GraphEditMode.SelectingBox:
+                case EGraphEditMode.SelectingBox:
                     {
                         Rectangle selectionRectangle = GetSelectionRectangle();
                         if (FillSelectionRectangle)
@@ -55,7 +55,7 @@ namespace FlowGraph
                         e.Graphics.DrawRectangle(m_outlineSelectionColor.Pen, selectionRectangle);
                     }
                     break;
-                case GraphEditMode.Linking:
+                case EGraphEditMode.Linking:
                     {
                         NodeConnector from = SelectedElement as NodeConnector;
                         if (from != null)

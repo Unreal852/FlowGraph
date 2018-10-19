@@ -65,7 +65,7 @@ namespace FlowGraph
         /// Edit mode
         /// </summary>
         [Browsable(false)]
-        public GraphEditMode EditMode { get; private set; }
+        public EGraphEditMode EditMode { get; private set; }
 
         /// <summary>
         /// Graph elements
@@ -77,43 +77,43 @@ namespace FlowGraph
         /// Verify if we are Idle
         /// </summary>
         [Browsable(false)]
-        public bool IsIdle => EditMode == GraphEditMode.Idle;
+        public bool IsIdle => EditMode == EGraphEditMode.Idle;
 
         /// <summary>
         /// Verify if we are linking
         /// </summary>
         [Browsable(false)]
-        public bool IsLinking => EditMode == GraphEditMode.Linking;
+        public bool IsLinking => EditMode == EGraphEditMode.Linking;
 
         /// <summary>
         /// Verify if we are moving selection
         /// </summary>
         [Browsable(false)]
-        public bool IsMovingSelection => EditMode == GraphEditMode.MovingSelection;
+        public bool IsMovingSelection => EditMode == EGraphEditMode.MovingSelection;
 
         /// <summary>
         /// Verify if we are scrolling
         /// </summary>
         [Browsable(false)]
-        public bool IsScrolling => EditMode == GraphEditMode.Scrolling;
+        public bool IsScrolling => EditMode == EGraphEditMode.Scrolling;
 
         /// <summary>
         /// Verify if we are selecting
         /// </summary>
         [Browsable(false)]
-        public bool IsSelecting => EditMode == GraphEditMode.Selecting;
+        public bool IsSelecting => EditMode == EGraphEditMode.Selecting;
 
         /// <summary>
         /// Verify if we are selecting box
         /// </summary>
         [Browsable(false)]
-        public bool IsSelectingBox => EditMode == GraphEditMode.SelectingBox;
+        public bool IsSelectingBox => EditMode == EGraphEditMode.SelectingBox;
 
         /// <summary>
         /// Verify if we are zooming
         /// </summary>
         [Browsable(false)]
-        public bool IsZooming => EditMode == GraphEditMode.Zooming;
+        public bool IsZooming => EditMode == EGraphEditMode.Zooming;
 
         /// <summary>
         /// Should we fill the selection rectangle
@@ -347,7 +347,7 @@ namespace FlowGraph
         /// Set edit mode
         /// </summary>
         /// <param name="editMode">Edit Mode</param>
-        public void SetEditMode(GraphEditMode editMode)
+        public void SetEditMode(EGraphEditMode editMode)
         {
             EditMode = editMode;
             Redraw();
@@ -656,13 +656,13 @@ namespace FlowGraph
         /// </summary>
         /// <param name="elements">Elements to align</param>
         /// <param name="align">Align type</param>
-        public void AlignElements(ICollection<IElement> elements, AlignType align)
+        public void AlignElements(ICollection<IElement> elements, EAlignType align)
         {
             if (elements.Count > 1)
             {
                 switch (align)
                 {
-                    case AlignType.Vertically:
+                    case EAlignType.Vertically:
                         {
                             IElement lastElement = elements.ElementAt(0);
                             foreach (IElement element in elements)
@@ -674,7 +674,7 @@ namespace FlowGraph
                             }
                         }
                         break;
-                    case AlignType.Horizontally:
+                    case EAlignType.Horizontally:
                         {
                             IElement lastElement = elements.ElementAt(0);
                             foreach (IElement element in elements)
@@ -686,7 +686,7 @@ namespace FlowGraph
                             }
                         }
                         break;
-                    case AlignType.Diagonally:
+                    case EAlignType.Diagonally:
                         {
                             IElement lastElement = elements.ElementAt(0);
                             foreach (IElement element in elements)
