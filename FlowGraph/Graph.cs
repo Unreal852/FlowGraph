@@ -11,7 +11,7 @@ namespace FlowGraph
 {
     public partial class Graph : Control
     {
-        public readonly Matrix Transformation = new Matrix();
+        public readonly Matrix Transformation        = new Matrix();
         public readonly Matrix InverseTransformation = new Matrix();
 
         private float m_smallGridStep = 16.0f;
@@ -19,24 +19,26 @@ namespace FlowGraph
 
         private bool m_dragElement = false;
 
-        private bool m_showGrid = true;
+        private bool m_showGrid       = true;
         private bool m_showDebugInfos = true;
 
         private bool m_timedRedraw = false;
 
         //private Point m_lastLocation;
         private Point m_lastLocation;
+
         private Point m_originalLocation;
+
         //private Point m_originalMouseLocation;
         private Point m_transformed_location;
 
         private Font m_debugFont = SystemFonts.DefaultFont;
 
-        private GraphColor m_smallGridStepColor = new GraphColor(Color.FromArgb(54, 54, 54));
-        private GraphColor m_largeGridStepColor = new GraphColor(Color.FromArgb(26, 26, 26));
-        private GraphColor m_selectionColor = new GraphColor(Color.FromArgb(30, 128, 90, 30));
+        private GraphColor m_smallGridStepColor    = new GraphColor(Color.FromArgb(54, 54, 54));
+        private GraphColor m_largeGridStepColor    = new GraphColor(Color.FromArgb(26, 26, 26));
+        private GraphColor m_selectionColor        = new GraphColor(Color.FromArgb(30, 128, 90, 30));
         private GraphColor m_outlineSelectionColor = new GraphColor(Color.DarkOrange);
-        private GraphColor m_linkingColor = new GraphColor(Color.Yellow);
+        private GraphColor m_linkingColor          = new GraphColor(Color.Yellow);
 
         private Timer m_timedRedrawTimer; // Todo: Create a hight precision timer; this one only use int...
 
@@ -149,8 +151,8 @@ namespace FlowGraph
             {
                 List<IElement> elements = new List<IElement>();
                 Rectangle viewRectangle = GetViewRectangle();
-                foreach (IElement element in m_graphElements)
-                    if (viewRectangle.IntersectsWith(element.Bounds))
+                foreach(IElement element in m_graphElements)
+                    if(viewRectangle.IntersectsWith(element.Bounds))
                         elements.Add(element);
                 elements.Reverse();
                 return elements;
@@ -165,10 +167,10 @@ namespace FlowGraph
             get => m_timedRedraw;
             set
             {
-                if (m_timedRedraw == value)
+                if(m_timedRedraw == value)
                     return;
                 m_timedRedraw = value;
-                if (value)
+                if(value)
                 {
                     m_timedRedrawTimer = new Timer();
                     m_timedRedrawTimer.Interval = (int)TimedRedrawInterval;
@@ -192,7 +194,7 @@ namespace FlowGraph
             get => m_showGrid;
             set
             {
-                if (m_showGrid == value)
+                if(m_showGrid == value)
                     return;
                 m_showGrid = value;
                 Redraw();
@@ -208,7 +210,7 @@ namespace FlowGraph
             get => m_showDebugInfos;
             set
             {
-                if (m_showDebugInfos == value)
+                if(m_showDebugInfos == value)
                     return;
                 m_showDebugInfos = value;
                 Redraw();
@@ -224,7 +226,7 @@ namespace FlowGraph
             get => m_smallGridStep;
             set
             {
-                if (m_smallGridStep == value)
+                if(m_smallGridStep == value)
                     return;
                 m_smallGridStep = value;
                 Redraw();
@@ -240,7 +242,7 @@ namespace FlowGraph
             get => m_largeGridStep;
             set
             {
-                if (m_largeGridStep == value)
+                if(m_largeGridStep == value)
                     return;
                 m_largeGridStep = value;
                 Redraw();
@@ -256,7 +258,7 @@ namespace FlowGraph
             get => m_smallGridStepColor.Color;
             set
             {
-                if (m_smallGridStepColor.Color == value)
+                if(m_smallGridStepColor.Color == value)
                     return;
                 m_smallGridStepColor = new GraphColor(value);
                 Redraw();
@@ -272,7 +274,7 @@ namespace FlowGraph
             get => m_largeGridStepColor.Color;
             set
             {
-                if (m_largeGridStepColor.Color == value)
+                if(m_largeGridStepColor.Color == value)
                     return;
                 m_largeGridStepColor = new GraphColor(value);
                 Redraw();
@@ -288,7 +290,7 @@ namespace FlowGraph
             get => m_selectionColor.Color;
             set
             {
-                if (m_selectionColor.Color == value)
+                if(m_selectionColor.Color == value)
                     return;
                 m_selectionColor = new GraphColor(value);
                 Redraw();
@@ -304,7 +306,7 @@ namespace FlowGraph
             get => m_outlineSelectionColor.Color;
             set
             {
-                if (m_outlineSelectionColor.Color == value)
+                if(m_outlineSelectionColor.Color == value)
                     return;
                 m_outlineSelectionColor = new GraphColor(value);
                 Redraw();
@@ -320,7 +322,7 @@ namespace FlowGraph
             get => m_linkingColor.Color;
             set
             {
-                if (m_linkingColor.Color == value)
+                if(m_linkingColor.Color == value)
                     return;
                 m_linkingColor = new GraphColor(value);
                 Redraw();
@@ -336,7 +338,7 @@ namespace FlowGraph
             get => m_debugFont;
             set
             {
-                if (m_debugFont == null || m_debugFont == value)
+                if(m_debugFont == null || m_debugFont == value)
                     return;
                 m_debugFont = value;
                 Redraw();
@@ -405,9 +407,9 @@ namespace FlowGraph
         private void MoveElement(IElement element, float deltaX, float deltaY)
         {
             element.Location = new GraphLocation((int)Math.Round(element.Location.X - deltaX), (int)Math.Round(element.Location.Y - deltaY));
-            if (element is NodeGroup group)
+            if(element is NodeGroup group)
             {
-                foreach (Node n in group.Nodes)
+                foreach(Node n in group.Nodes)
                     MoveElement(n, deltaX, deltaY);
             }
         }
@@ -429,12 +431,13 @@ namespace FlowGraph
         /// <returns><see cref="Point"/> Original mouse location</returns>
         public Point GetOriginalMouseLocation()
         {
-            if (m_originalLocation != null)
+            if(m_originalLocation != null)
             {
-                Point[] points = new Point[] { m_originalLocation };
+                Point[] points = new Point[] {m_originalLocation};
                 Transformation.TransformPoints(points);
                 return PointToScreen(new Point(points[0].X, points[0].Y)); // Todo: creating a new one ? why not getting the one directly in the points
             }
+
             return new Point(0, 0);
         }
 
@@ -444,7 +447,7 @@ namespace FlowGraph
         /// <param name="baseLoc">Base location</param>
         private void SetTransformedLocation(Point baseLoc)
         {
-            Point[] points = new Point[] { baseLoc };
+            Point[] points = new Point[] {baseLoc};
             InverseTransformation.TransformPoints(points);
             m_transformed_location = points[0];
         }
@@ -456,10 +459,10 @@ namespace FlowGraph
         /// <param name="select">Select element</param>
         public void AddElement(IElement element, bool select = false)
         {
-            if (m_graphElements.Contains(element))
+            if(m_graphElements.Contains(element))
                 return;
             m_graphElements.Add(element);
-            if (select && element.CanBeSelected)
+            if(select && element.CanBeSelected)
                 Selection.AddElement(element);
             Redraw();
         }
@@ -470,7 +473,7 @@ namespace FlowGraph
         /// <param name="element">Element to remove</param>
         public void RemoveElement(IElement element)
         {
-            if (m_graphElements.Contains(element))
+            if(m_graphElements.Contains(element))
             {
                 m_graphElements.Remove(element);
                 Redraw();
@@ -504,12 +507,13 @@ namespace FlowGraph
         /// <returns><see cref="IElement"/> if a element has been found, <see cref="null"/> otherwise</returns>
         public IElement FindElementAt(Point location, bool onlyVisible)
         {
-            foreach (IElement element in GetElements(onlyVisible))
+            foreach(IElement element in GetElements(onlyVisible))
             {
                 IElement foundElement = element.FindElementAt(location);
-                if (foundElement != null)
+                if(foundElement != null)
                     return foundElement;
             }
+
             return null;
         }
 
@@ -522,12 +526,13 @@ namespace FlowGraph
         /// <returns><see cref="IElement"/> if a element has been found, <see cref="null"/> otherwise</returns>
         public IElement FindElementAt<T>(Point location, bool onlyVisible) where T : IElement
         {
-            foreach (IElement element in GetElements(onlyVisible))
+            foreach(IElement element in GetElements(onlyVisible))
             {
                 IElement foundElement = element.FindElementAt(location);
-                if (foundElement is T e)
+                if(foundElement is T e)
                     return e;
             }
+
             return null;
         }
 
@@ -540,12 +545,13 @@ namespace FlowGraph
         public IElement[] FindElementsAt(Point location, bool onlyVisible)
         {
             List<IElement> elements = new List<IElement>();
-            foreach (IElement element in GetElements(onlyVisible))
+            foreach(IElement element in GetElements(onlyVisible))
             {
                 IElement foundElement = element.FindElementAt(location);
-                if (foundElement != null)
+                if(foundElement != null)
                     elements.Add(foundElement);
             }
+
             return elements.ToArray();
         }
 
@@ -559,12 +565,13 @@ namespace FlowGraph
         public IElement[] FindElementsAt<T>(Point location, bool onlyVisible) where T : IElement
         {
             List<IElement> elements = new List<IElement>();
-            foreach (IElement element in GetElements(onlyVisible))
+            foreach(IElement element in GetElements(onlyVisible))
             {
                 IElement foundElement = element.FindElementAt(location);
-                if (foundElement is T e)
+                if(foundElement is T e)
                     elements.Add(e);
             }
+
             return elements.ToArray();
         }
 
@@ -575,13 +582,14 @@ namespace FlowGraph
         {
             Rectangle selectRectangle = GetSelectionRectangle();
             List<IElement> selectedElements = new List<IElement>();
-            foreach (IElement element in m_graphElements)
+            foreach(IElement element in m_graphElements)
             {
-                if (!element.CanBeSelected || element.Owner != null)
+                if(!element.CanBeSelected || element.Owner != null)
                     continue;
-                if (element.Bounds.IntersectsWith(selectRectangle))
+                if(element.Bounds.IntersectsWith(selectRectangle))
                     selectedElements.Add(element);
             }
+
             Selection.UnselectAll();
             Selection.AddElements(selectedElements);
         }
@@ -594,7 +602,7 @@ namespace FlowGraph
         /// <param name="onlyVisible">Find only visible elements</param>
         public void CallElementsAt(Point location, Action<IElement> action, bool onlyVisible = true)
         {
-            foreach (IElement element in FindElementsAt(location, onlyVisible))
+            foreach(IElement element in FindElementsAt(location, onlyVisible))
                 action(element);
         }
 
@@ -606,24 +614,26 @@ namespace FlowGraph
         {
             m_graphElements.Remove(element);
             m_graphElements.Insert(0, element);
-            if (element is NodeGroup group)
+            if(element is NodeGroup group)
             {
-                foreach (Node node in group.Nodes)
+                foreach(Node node in group.Nodes)
                 {
                     m_graphElements.Remove(node);
                     m_graphElements.Insert(0, node);
                 }
             }
+
             Redraw();
         }
 
         public void Redraw(bool instantly = false)
         {
-            if (TimedRedraw)
+            if(TimedRedraw)
                 return;
-            if (instantly)
+            if(instantly)
                 Refresh();
-            Invalidate();
+            else
+                Invalidate();
         }
 
         /// <summary>
@@ -631,9 +641,9 @@ namespace FlowGraph
         /// </summary>
         private void UpdateMatrices()
         {
-            if (Zoom.Zoom < 0.25f)
+            if(Zoom.Zoom < 0.25f)
                 Zoom.Zoom = 0.25f;
-            if (Zoom.Zoom > 5.00f)
+            if(Zoom.Zoom > 5.00f)
                 Zoom.Zoom = 5.00f;
 
             PointF center = new PointF(Width / 2.0f, Height / 2.0f);
@@ -658,47 +668,48 @@ namespace FlowGraph
         /// <param name="align">Align type</param>
         public void AlignElements(ICollection<IElement> elements, EAlignType align)
         {
-            if (elements.Count > 1)
+            if(elements.Count > 1)
             {
-                switch (align)
+                switch(align)
                 {
                     case EAlignType.Vertically:
+                    {
+                        IElement lastElement = elements.ElementAt(0);
+                        foreach(IElement element in elements)
                         {
-                            IElement lastElement = elements.ElementAt(0);
-                            foreach (IElement element in elements)
-                            {
-                                if (element == lastElement)
-                                    continue;
-                                element.Location = new GraphLocation(lastElement.Location.X, (lastElement.Location.Y + lastElement.Size.Height) + AlignMargin);
-                                lastElement = element;
-                            }
+                            if(element == lastElement)
+                                continue;
+                            element.Location = new GraphLocation(lastElement.Location.X, (lastElement.Location.Y + lastElement.Size.Height) + AlignMargin);
+                            lastElement = element;
                         }
+                    }
                         break;
                     case EAlignType.Horizontally:
+                    {
+                        IElement lastElement = elements.ElementAt(0);
+                        foreach(IElement element in elements)
                         {
-                            IElement lastElement = elements.ElementAt(0);
-                            foreach (IElement element in elements)
-                            {
-                                if (element == lastElement)
-                                    continue;
-                                element.Location = new GraphLocation((lastElement.Location.X + lastElement.Size.Width) + AlignMargin, lastElement.Location.Y);
-                                lastElement = element;
-                            }
+                            if(element == lastElement)
+                                continue;
+                            element.Location = new GraphLocation((lastElement.Location.X + lastElement.Size.Width) + AlignMargin, lastElement.Location.Y);
+                            lastElement = element;
                         }
+                    }
                         break;
                     case EAlignType.Diagonally:
+                    {
+                        IElement lastElement = elements.ElementAt(0);
+                        foreach(IElement element in elements)
                         {
-                            IElement lastElement = elements.ElementAt(0);
-                            foreach (IElement element in elements)
-                            {
-                                if (element == lastElement)
-                                    continue;
-                                element.Location = new GraphLocation((lastElement.Location.X + lastElement.Size.Width) + AlignMargin, (lastElement.Location.Y + lastElement.Size.Height) + AlignMargin);
-                                lastElement = element;
-                            }
+                            if(element == lastElement)
+                                continue;
+                            element.Location = new GraphLocation((lastElement.Location.X + lastElement.Size.Width) + AlignMargin, (lastElement.Location.Y + lastElement.Size.Height) + AlignMargin);
+                            lastElement = element;
                         }
+                    }
                         break;
                 }
+
                 Redraw();
             }
         }

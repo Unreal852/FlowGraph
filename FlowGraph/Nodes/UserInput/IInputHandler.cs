@@ -2,6 +2,5 @@
 {
     public interface IInputHandler : IKeyDownHandler, IKeyUpHandler, IMouseDownHandler, IMouseUpHandler, IMouseDoubleClickHandler, IMouseWheelHandler
     {
-
     }
 }

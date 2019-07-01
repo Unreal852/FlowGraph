@@ -45,10 +45,10 @@ namespace FlowGraph
         /// <param name="element">Element</param>
         public void AddElement(IElement element)
         {
-            if (!element.CanBeSelected)
+            if(!element.CanBeSelected)
                 return;
             m_selectedElements.Add(element);
-            if (!element.Selected)
+            if(!element.Selected)
                 element.Selected = true;
             Graph.BringElementToFront(element);
         }
@@ -59,7 +59,7 @@ namespace FlowGraph
         /// <param name="elements">Elements</param>
         public void AddElements(ICollection<IElement> elements)
         {
-            foreach (IElement element in elements)
+            foreach(IElement element in elements)
                 AddElement(element);
         }
 
@@ -80,7 +80,7 @@ namespace FlowGraph
         /// <returns> <see cref="(IElement element, bool Selected)"/> for each specified elements</returns>
         public IEnumerable<(IElement Element, bool Selected)> AreSelected(IEnumerable<IElement> elements)
         {
-            foreach (IElement element in elements)
+            foreach(IElement element in elements)
                 yield return (element, m_selectedElements.Contains(element));
         }
 

@@ -68,5 +68,10 @@ namespace ImageGraphSample
             MyGraph.AddElement(element);
             MyGraph.Focus();
         }
+
+        private void MyGraph_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

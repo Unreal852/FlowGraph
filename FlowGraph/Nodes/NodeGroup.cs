@@ -107,7 +107,7 @@ namespace FlowGraph.Nodes
             get => m_location;
             set
             {
-                if (m_location == value || (m_location.X == value.X && m_location.Y == value.Y))
+                if(m_location == value || (m_location.X == value.X && m_location.Y == value.Y))
                     return;
                 m_location = value;
                 UpdateBounds();
@@ -122,11 +122,11 @@ namespace FlowGraph.Nodes
             get => m_size;
             set
             {
-                if (m_size == value || (m_size.Width == value.Width && m_size.Height == value.Height))
+                if(m_size == value || (m_size.Width == value.Width && m_size.Height == value.Height))
                     return;
-                if (value > MaxSize)
+                if(value > MaxSize)
                     value = new GraphSize(Math.Min(value.Width, MaxSize.Width), Math.Min(value.Height, MaxSize.Height));
-                if (value < MinSize)
+                if(value < MinSize)
                     value = new GraphSize(Math.Max(value.Width, MinSize.Width), Math.Max(value.Height, MinSize.Height));
                 m_size = value;
                 UpdateBounds();
@@ -193,7 +193,7 @@ namespace FlowGraph.Nodes
         /// </summary>
         public Font DescriptionFont { get; set; } = new Font(new FontFamily(SystemFonts.DefaultFont.Name), 8f, FontStyle.Italic);
 
-        internal void UpdateBounds()   // Todo: measure text to avoid out of node string
+        internal void UpdateBounds() // Todo: measure text to avoid out of node string
         {
             Bounds = new Rectangle(Location.X, Location.Y, Size.Width, Size.Height);
             HeaderBounds = new Rectangle(Location.X, Location.Y - 20, Size.Width / 2, 20);
@@ -215,15 +215,16 @@ namespace FlowGraph.Nodes
         /// <returns><see cref="IElement"/> found element, <see cref="null"/> otherwise</returns>
         public IElement FindElementAt(Point point)
         {
-            if (HeaderBounds.Contains(point))
+            if(HeaderBounds.Contains(point))
                 return this;
-            foreach (Node node in m_nodes)
+            foreach(Node node in m_nodes)
             {
                 IElement element = node.FindElementAt(point);
-                if (element != null)
+                if(element != null)
                     return element;
             }
-            if (Bounds.Contains(point) || this.IsInAnyGrip(point))
+
+            if(Bounds.Contains(point) || this.IsInAnyGrip(point))
                 return this;
             return null;
         }
@@ -234,7 +235,7 @@ namespace FlowGraph.Nodes
         /// <param name="node">Node</param>
         public void AddNode(Node node)
         {
-            if (!m_nodes.Contains(node))
+            if(!m_nodes.Contains(node))
             {
                 node.Owner = this;
                 m_nodes.Add(node);
@@ -247,7 +248,7 @@ namespace FlowGraph.Nodes
         /// <param name="node">Node</param>
         public void RemoveNode(Node node)
         {
-            if (m_nodes.Contains(node))
+            if(m_nodes.Contains(node))
             {
                 node.Owner = null;
                 m_nodes.Remove(node);
@@ -260,7 +261,7 @@ namespace FlowGraph.Nodes
         /// <param name="index">Node Index</param>
         public void RemoveNode(int index)
         {
-            if (m_nodes.Count <= index)
+            if(m_nodes.Count <= index)
             {
                 m_nodes[index].Owner = null;
                 m_nodes.RemoveAt(index);
@@ -277,7 +278,7 @@ namespace FlowGraph.Nodes
         /// </summary>
         public virtual void OnRender(ElementRenderEventArgs e) //Todo: maybe cache all points in the updatebounds method 
         {
-            if (Selected)
+            if(Selected)
             {
                 e.Graphics.DrawLine(SelectedOutlineColor.Pen, HeaderUpperLeft, HeaderUpperRight);
                 e.Graphics.DrawLine(SelectedOutlineColor.Pen, HeaderUpperLeft, UpperLeft);

@@ -87,7 +87,7 @@ namespace FlowGraph.Nodes.Connections
         public IElement FindElementAt(Point point)
         {
             Region region = RenderHelper.GetConnectionRegion(this);
-            if (region != null && region.IsVisible(point))
+            if(region != null && region.IsVisible(point))
                 return this;
             return null;
         }
@@ -119,14 +119,13 @@ namespace FlowGraph.Nodes.Connections
             ggPath.AddLine(From.Bounds.X, From.Bounds.Y, From.Bounds.X - 25, From.Bounds.Y);
             ggPath.AddLine(From.Bounds.X - 25, From.Bounds.Y, To.Bounds.X + 25, To.Bounds.Y);
             ggPath.AddLine(To.Bounds.X, To.Bounds.Y, To.Bounds.X + 25, To.Bounds.Y);
-            
+
             Region reg = new Region(ggPath);
             Hovered = reg.IsVisible(e.MouseLocation);
-            if (Hovered)
+            if(Hovered)
                 e.Graphics.DrawPath(HoveredConnectionColor.Pen, ggPath);
             else
                 e.Graphics.DrawPath(ConnectionColor.Pen, ggPath);
-
         }
     }
 }

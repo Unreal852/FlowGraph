@@ -12,7 +12,7 @@ namespace FlowGraph
         /// <returns><see cref="{T}"/> if successfull cast, <see cref="null"/> otherwise</returns>
         public static T As<T>(this IElement element) where T : class //For nullable return
         {
-            if (element is T casted)
+            if(element is T casted)
                 return casted;
             return null;
         }
@@ -24,11 +24,11 @@ namespace FlowGraph
 
         public static EGrip GetCurrentGrip(this IExpandableElement element, Point point)
         {
-            if (element.BottomGripBounds != null && element.BottomGripBounds.Contains(point))
+            if(element.BottomGripBounds != null && element.BottomGripBounds.Contains(point))
                 return EGrip.Bottom;
-            else if (element.RightGripBounds != null && element.RightGripBounds.Contains(point))
+            else if(element.RightGripBounds != null && element.RightGripBounds.Contains(point))
                 return EGrip.Right;
-            else if (element.BottomRightGripBounds != null && element.BottomRightGripBounds.Contains(point))
+            else if(element.BottomRightGripBounds != null && element.BottomRightGripBounds.Contains(point))
                 return EGrip.BottomRight;
             return EGrip.None;
         }

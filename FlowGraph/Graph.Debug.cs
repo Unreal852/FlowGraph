@@ -42,7 +42,7 @@ namespace FlowGraph
                 FPS = m_debugCalls;
                 BackgroundRenderTime = TimeSpan.FromTicks(m_debugBackgroundRenderTime).TotalMilliseconds;
                 ElementsRenderTime = TimeSpan.FromTicks(m_debugElementsRenderTime).TotalMilliseconds;
-                TotalRenderTime = TimeSpan.FromTicks(m_debugTotalRenderTime).TotalMilliseconds;
+                TotalRenderTime = BackgroundRenderTime + ElementsRenderTime;
                 m_debugCalls = 0;
                 m_debugLastCall = Environment.TickCount;
             }

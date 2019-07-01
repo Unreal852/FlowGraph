@@ -5,11 +5,11 @@ using System.Windows.Forms;
 
 namespace GraphSample
 {
-    public partial class frmMain : Form
+    public partial class FrmMain : Form
     {
         private Timer m_timer;
 
-        public frmMain()
+        public FrmMain()
         {
             InitializeComponent();
 
@@ -20,11 +20,11 @@ namespace GraphSample
             Random rnd = new Random();
 
             int nodeY = 20;
-            for (int i = 0; i < 3; i++)
+            for(int i = 0; i < 5; i++)
             {
                 nodeY += 20;
-                Node node = new Node(graph1) { Location = new FlowGraph.GraphLocation(0, nodeY), Title = "Test" };
-                node.Add(new LabelItem() { Size = new FlowGraph.GraphSize(node.Size.Width, 30) });
+                Node node = new Node(graph1) {Location = new FlowGraph.GraphLocation(0, nodeY), Title = "Test"};
+                node.Add(new LabelItem() {Size = new FlowGraph.GraphSize(node.Size.Width, 30)});
                 graph1.AddElement(node);
             }
 

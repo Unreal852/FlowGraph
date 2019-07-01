@@ -137,7 +137,7 @@ namespace FlowGraph.Nodes
             get => m_location;
             set
             {
-                if (m_location == value || (m_location.X == value.X && m_location.Y == value.Y))
+                if(m_location == value || (m_location.X == value.X && m_location.Y == value.Y))
                     return;
                 m_location = value;
                 UpdateBounds();
@@ -152,7 +152,7 @@ namespace FlowGraph.Nodes
             get => m_size;
             set
             {
-                if (m_size == value || (m_size.Width == value.Width && m_size.Height == value.Height))
+                if(m_size == value || (m_size.Width == value.Width && m_size.Height == value.Height))
                     return;
                 m_size = value;
                 UpdateBounds();
@@ -167,25 +167,26 @@ namespace FlowGraph.Nodes
         {
             int height = 0;
             int width = 0;
-            foreach (NodeItem item in m_items)
+            foreach(NodeItem item in m_items)
             {
                 height += item.Size.Height;
                 width += item.Size.Width;
             }
+
             return (width, height);
         }
 
         /// <summary>
         /// Update bounds
         /// </summary>
-        private void UpdateBounds()   // Todo: measure text to avoid out of node string
+        private void UpdateBounds() // Todo: measure text to avoid out of node string
         {
             Bounds = new Rectangle(Location.X, Location.Y, Size.Width, Size.Height);
             HeaderBounds = new Rectangle(Location.X, Location.Y, Size.Width, string.IsNullOrWhiteSpace(Description) ? 20 : 30);
-            if (m_items.Count > 0)
+            if(m_items.Count > 0)
             {
                 int itemsHeight = 0;
-                for (int i = 0; i < m_items.Count; i++)
+                for(int i = 0; i < m_items.Count; i++)
                 {
                     NodeItem item = m_items[i];
                     item.UpdateBounds(new GraphLocation(Location.X, (Location.Y + HeaderBounds.Height + itemsHeight) + (ItemsMargin * i)));
@@ -201,13 +202,14 @@ namespace FlowGraph.Nodes
         /// <returns><see cref="IElement"/> if a element has been found, <see cref="null"/> otherwise</returns>
         public IElement FindElementAt(Point point)
         {
-            foreach (NodeItem item in m_items)
+            foreach(NodeItem item in m_items)
             {
                 IElement element = item.FindElementAt(point);
-                if (element != null)
+                if(element != null)
                     return element;
             }
-            if (Bounds.Contains(point))
+
+            if(Bounds.Contains(point))
                 return this;
             return null;
         }
@@ -222,7 +224,7 @@ namespace FlowGraph.Nodes
             item.Owner = this;
             m_items.Add(item);
             int totalHeight = (GetTotalItemsSize().Height + (ItemsMargin * m_items.Count) + HeaderBounds.Height);
-            if (totalHeight > Bounds.Height)
+            if(totalHeight > Bounds.Height)
                 Size = new GraphSize(Bounds.Width, totalHeight);
         }
 
@@ -262,7 +264,7 @@ namespace FlowGraph.Nodes
         /// <param name="index">Index</param>
         public void RemoveAt(int index)
         {
-            if (m_items.Count - 1 < index && index > -1)
+            if(m_items.Count - 1 < index && index > -1)
                 m_items.RemoveAt(index);
         }
 
@@ -271,7 +273,7 @@ namespace FlowGraph.Nodes
         /// </summary>
         public void Clear()
         {
-            foreach (NodeItem item in m_items)
+            foreach(NodeItem item in m_items)
                 item.Owner = null;
             m_items.Clear();
         }
@@ -301,7 +303,7 @@ namespace FlowGraph.Nodes
         /// <returns><see cref="NodeItem"/> if a item has been found, <see cref="null"/> otherwise</returns>
         public NodeItem GetItem(int index)
         {
-            if (m_items.Count > -1 && m_items.Count < index)
+            if(m_items.Count > -1 && m_items.Count < index)
                 return m_items[index];
             return null;
         }
@@ -314,8 +316,8 @@ namespace FlowGraph.Nodes
         public T[] GetItems<T>() where T : class
         {
             List<T> items = new List<T>();
-            foreach (NodeItem i in m_items)
-                if (i.GetType() == typeof(T))
+            foreach(NodeItem i in m_items)
+                if(i.GetType() == typeof(T))
                     items.Add((i as T));
             return items.ToArray();
         }
@@ -325,7 +327,7 @@ namespace FlowGraph.Nodes
         /// </summary>
         public virtual void OnRender(ElementRenderEventArgs e)
         {
-            if (Selected)
+            if(Selected)
             {
                 e.Graphics.FillRectangle(SelectedBackgroundColor.Brush, Bounds);
                 e.Graphics.FillRectangle(SelectedHeaderColor.Brush, HeaderBounds);
@@ -338,12 +340,12 @@ namespace FlowGraph.Nodes
                 e.Graphics.DrawRectangle(OutlineColor.Pen, Bounds);
             }
 
-            if (!string.IsNullOrWhiteSpace(Title))
+            if(!string.IsNullOrWhiteSpace(Title))
                 e.Graphics.DrawString(Title, TitleFont, TitleColor.Brush, (float)HeaderBounds.X + 5, (float)HeaderBounds.Y + 5);
-            if (!string.IsNullOrWhiteSpace(Description))
+            if(!string.IsNullOrWhiteSpace(Description))
                 e.Graphics.DrawString(Description, DescriptionFont, DescriptionColor.Brush, (float)HeaderBounds.X + 5, (float)HeaderBounds.Y + 17);
 
-            foreach (NodeItem item in m_items)
+            foreach(NodeItem item in m_items)
                 item.OnRender(e);
         }
     }

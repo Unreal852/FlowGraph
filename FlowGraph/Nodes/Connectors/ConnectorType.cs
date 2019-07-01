@@ -6,6 +6,7 @@
         /// Input connector ( left side )
         /// </summary>
         Input,
+
         /// <summary>
         /// Output connector ( right side )
         /// </summary>

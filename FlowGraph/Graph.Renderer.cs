@@ -66,8 +66,6 @@ namespace FlowGraph
 
             e.Graphics.SmoothingMode = SmoothingMode.None;
 
-            m_debugTotalRenderTime = (DateTime.UtcNow.Ticks - d_renderStart);
-
             if (ShowDebugInfos)
             {
                 DebugCall();  //we should call the framerate at the end of a rendering method, but here we want to ignore the debug render time

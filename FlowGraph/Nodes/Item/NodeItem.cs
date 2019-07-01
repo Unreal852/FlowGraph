@@ -11,12 +11,11 @@ namespace FlowGraph.Nodes.Item
 
         private GraphSize m_size = new GraphSize(0, 0);
 
-        private NodeConnector m_input = null;
+        private NodeConnector m_input  = null;
         private NodeConnector m_output = null;
 
         public NodeItem()
         {
-
         }
 
         /// <summary>
@@ -74,7 +73,7 @@ namespace FlowGraph.Nodes.Item
             get => m_input;
             set
             {
-                if (m_input == value)
+                if(m_input == value)
                     return;
                 m_input = value;
                 UpdateBounds();
@@ -89,7 +88,7 @@ namespace FlowGraph.Nodes.Item
             get => m_output;
             set
             {
-                if (m_output == value)
+                if(m_output == value)
                     return;
                 m_output = value;
                 UpdateBounds();
@@ -101,11 +100,11 @@ namespace FlowGraph.Nodes.Item
         /// </summary>
         public void CallInputValueChanged()
         {
-            if (Output != null && Output.IsConnected)
+            if(Output != null && Output.IsConnected)
             {
-                foreach (NodeConnection con in Output.Connections)
+                foreach(NodeConnection con in Output.Connections)
                 {
-                    if (con.To.Owner is IConnectorHandler)
+                    if(con.To.Owner is IConnectorHandler)
                         ((IConnectorHandler)con.To.Owner).OnInputValueChanged();
                 }
             }
@@ -114,9 +113,9 @@ namespace FlowGraph.Nodes.Item
         /// <summary>
         /// Update bounds
         /// </summary>
-        internal void UpdateBounds(GraphLocation location = null)   // Todo: measure text to avoid out of node string
+        internal void UpdateBounds(GraphLocation location = null) // Todo: measure text to avoid out of node string
         {
-            if (location != null)
+            if(location != null)
                 Location = location;
             Bounds = new Rectangle(Location.X, Location.Y, Size.Width, Size.Height);
             Input?.UpdateBounds(new GraphLocation(Bounds.X, Bounds.Y + (Bounds.Size.Height / 2)));
@@ -131,19 +130,21 @@ namespace FlowGraph.Nodes.Item
         public IElement FindElementAt(Point point)
         {
             IElement element;
-            if (Input != null)
+            if(Input != null)
             {
                 element = Input.FindElementAt(point);
-                if (element != null)
+                if(element != null)
                     return element;
             }
-            if (Output != null)
+
+            if(Output != null)
             {
                 element = Output.FindElementAt(point);
-                if (element != null)
+                if(element != null)
                     return element;
             }
-            if (Bounds.Contains(point))
+
+            if(Bounds.Contains(point))
                 return this;
             return null;
         }

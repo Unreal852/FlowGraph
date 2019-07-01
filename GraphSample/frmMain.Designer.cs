@@ -1,6 +1,6 @@
 ﻿namespace GraphSample
 {
-    partial class frmMain
+    partial class FrmMain
     {
         /// <summary>
         /// Variable nécessaire au concepteur.
@@ -53,6 +53,7 @@
             this.graph1.SmallGridStepColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(54)))), ((int)(((byte)(54)))));
             this.graph1.TabIndex = 1;
             this.graph1.Text = "graph1";
+            this.graph1.TimedRedraw = false;
             // 
             // frmMain
             // 
@@ -61,7 +62,7 @@
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(1249, 506);
             this.Controls.Add(this.graph1);
-            this.Name = "frmMain";
+            this.Name = "FrmMain";
             this.Text = "Graph Sample";
             this.ResumeLayout(false);
 

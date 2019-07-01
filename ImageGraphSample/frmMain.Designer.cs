@@ -34,16 +34,16 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.PreviewPicturebox = new System.Windows.Forms.PictureBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.MyGraph = new FlowGraph.Graph();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnMirrorDown = new System.Windows.Forms.Button();
+            this.btnNewInput = new System.Windows.Forms.Button();
+            this.btnMerge = new System.Windows.Forms.Button();
+            this.btnIntValue = new System.Windows.Forms.Button();
+            this.btnResizeProportionally = new System.Windows.Forms.Button();
             this.btnResize = new System.Windows.Forms.Button();
             this.btnRotateFlip = new System.Windows.Forms.Button();
             this.btnGreyScale = new System.Windows.Forms.Button();
-            this.btnResizeProportionally = new System.Windows.Forms.Button();
-            this.MyGraph = new FlowGraph.Graph();
-            this.btnIntValue = new System.Windows.Forms.Button();
-            this.btnMerge = new System.Windows.Forms.Button();
-            this.btnNewInput = new System.Windows.Forms.Button();
-            this.btnMirrorDown = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PreviewPicturebox)).BeginInit();
@@ -115,6 +115,30 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Flow Graph";
             // 
+            // MyGraph
+            // 
+            this.MyGraph.AlignMargin = 10;
+            this.MyGraph.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(42)))));
+            this.MyGraph.DebugFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MyGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MyGraph.FillSelectionRectangle = false;
+            this.MyGraph.LargeGridStep = 128F;
+            this.MyGraph.LargeGridStepColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(26)))));
+            this.MyGraph.LinkingColor = System.Drawing.Color.Yellow;
+            this.MyGraph.Location = new System.Drawing.Point(203, 16);
+            this.MyGraph.Name = "MyGraph";
+            this.MyGraph.OutlineSelectionColor = System.Drawing.Color.DarkOrange;
+            this.MyGraph.SelectedElement = null;
+            this.MyGraph.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(128)))), ((int)(((byte)(90)))), ((int)(((byte)(30)))));
+            this.MyGraph.ShowDebugInfos = false;
+            this.MyGraph.ShowGrid = true;
+            this.MyGraph.Size = new System.Drawing.Size(1190, 387);
+            this.MyGraph.SmallGridStep = 16F;
+            this.MyGraph.SmallGridStepColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(54)))), ((int)(((byte)(54)))));
+            this.MyGraph.TabIndex = 0;
+            this.MyGraph.TimedRedraw = false;
+            this.MyGraph.Click += new System.EventHandler(this.MyGraph_Click);
+            // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(42)))));
@@ -131,6 +155,56 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(200, 387);
             this.panel1.TabIndex = 1;
+            // 
+            // btnMirrorDown
+            // 
+            this.btnMirrorDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMirrorDown.Location = new System.Drawing.Point(102, 69);
+            this.btnMirrorDown.Name = "btnMirrorDown";
+            this.btnMirrorDown.Size = new System.Drawing.Size(95, 60);
+            this.btnMirrorDown.TabIndex = 8;
+            this.btnMirrorDown.Text = "Mirror Down";
+            this.btnMirrorDown.UseVisualStyleBackColor = true;
+            // 
+            // btnNewInput
+            // 
+            this.btnNewInput.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNewInput.Location = new System.Drawing.Point(102, 323);
+            this.btnNewInput.Name = "btnNewInput";
+            this.btnNewInput.Size = new System.Drawing.Size(95, 60);
+            this.btnNewInput.TabIndex = 7;
+            this.btnNewInput.Text = "Input";
+            this.btnNewInput.UseVisualStyleBackColor = true;
+            // 
+            // btnMerge
+            // 
+            this.btnMerge.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMerge.Location = new System.Drawing.Point(3, 135);
+            this.btnMerge.Name = "btnMerge";
+            this.btnMerge.Size = new System.Drawing.Size(95, 60);
+            this.btnMerge.TabIndex = 5;
+            this.btnMerge.Text = "Merge";
+            this.btnMerge.UseVisualStyleBackColor = true;
+            // 
+            // btnIntValue
+            // 
+            this.btnIntValue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnIntValue.Location = new System.Drawing.Point(3, 359);
+            this.btnIntValue.Name = "btnIntValue";
+            this.btnIntValue.Size = new System.Drawing.Size(95, 24);
+            this.btnIntValue.TabIndex = 4;
+            this.btnIntValue.Text = "Int Value";
+            this.btnIntValue.UseVisualStyleBackColor = true;
+            // 
+            // btnResizeProportionally
+            // 
+            this.btnResizeProportionally.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnResizeProportionally.Location = new System.Drawing.Point(102, 135);
+            this.btnResizeProportionally.Name = "btnResizeProportionally";
+            this.btnResizeProportionally.Size = new System.Drawing.Size(95, 60);
+            this.btnResizeProportionally.TabIndex = 3;
+            this.btnResizeProportionally.Text = "Resize Proportionally";
+            this.btnResizeProportionally.UseVisualStyleBackColor = true;
             // 
             // btnResize
             // 
@@ -161,77 +235,6 @@
             this.btnGreyScale.TabIndex = 0;
             this.btnGreyScale.Text = "Grey Scale Node";
             this.btnGreyScale.UseVisualStyleBackColor = true;
-            // 
-            // btnResizeProportionally
-            // 
-            this.btnResizeProportionally.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnResizeProportionally.Location = new System.Drawing.Point(102, 135);
-            this.btnResizeProportionally.Name = "btnResizeProportionally";
-            this.btnResizeProportionally.Size = new System.Drawing.Size(95, 60);
-            this.btnResizeProportionally.TabIndex = 3;
-            this.btnResizeProportionally.Text = "Resize Proportionally";
-            this.btnResizeProportionally.UseVisualStyleBackColor = true;
-            // 
-            // MyGraph
-            // 
-            this.MyGraph.AlignMargin = 10;
-            this.MyGraph.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(42)))));
-            this.MyGraph.DebugFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MyGraph.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MyGraph.FillSelectionRectangle = false;
-            this.MyGraph.LargeGridStep = 128F;
-            this.MyGraph.LargeGridStepColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(26)))), ((int)(((byte)(26)))));
-            this.MyGraph.LinkingColor = System.Drawing.Color.Yellow;
-            this.MyGraph.Location = new System.Drawing.Point(203, 16);
-            this.MyGraph.Name = "MyGraph";
-            this.MyGraph.OutlineSelectionColor = System.Drawing.Color.DarkOrange;
-            this.MyGraph.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(128)))), ((int)(((byte)(90)))), ((int)(((byte)(30)))));
-            this.MyGraph.ShowDebugInfos = false;
-            this.MyGraph.ShowGrid = true;
-            this.MyGraph.Size = new System.Drawing.Size(1190, 387);
-            this.MyGraph.SmallGridStep = 16F;
-            this.MyGraph.SmallGridStepColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(54)))), ((int)(((byte)(54)))));
-            this.MyGraph.TabIndex = 0;
-            // 
-            // btnIntValue
-            // 
-            this.btnIntValue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnIntValue.Location = new System.Drawing.Point(3, 359);
-            this.btnIntValue.Name = "btnIntValue";
-            this.btnIntValue.Size = new System.Drawing.Size(95, 24);
-            this.btnIntValue.TabIndex = 4;
-            this.btnIntValue.Text = "Int Value";
-            this.btnIntValue.UseVisualStyleBackColor = true;
-            // 
-            // btnMerge
-            // 
-            this.btnMerge.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMerge.Location = new System.Drawing.Point(3, 135);
-            this.btnMerge.Name = "btnMerge";
-            this.btnMerge.Size = new System.Drawing.Size(95, 60);
-            this.btnMerge.TabIndex = 5;
-            this.btnMerge.Text = "Merge";
-            this.btnMerge.UseVisualStyleBackColor = true;
-            // 
-            // btnNewInput
-            // 
-            this.btnNewInput.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNewInput.Location = new System.Drawing.Point(102, 323);
-            this.btnNewInput.Name = "btnNewInput";
-            this.btnNewInput.Size = new System.Drawing.Size(95, 60);
-            this.btnNewInput.TabIndex = 7;
-            this.btnNewInput.Text = "Input";
-            this.btnNewInput.UseVisualStyleBackColor = true;
-            // 
-            // btnMirrorDown
-            // 
-            this.btnMirrorDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMirrorDown.Location = new System.Drawing.Point(102, 69);
-            this.btnMirrorDown.Name = "btnMirrorDown";
-            this.btnMirrorDown.Size = new System.Drawing.Size(95, 60);
-            this.btnMirrorDown.TabIndex = 8;
-            this.btnMirrorDown.Text = "Mirror Down";
-            this.btnMirrorDown.UseVisualStyleBackColor = true;
             // 
             // frmMain
             // 

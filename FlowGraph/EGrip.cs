@@ -9,22 +9,27 @@ namespace FlowGraph
         /// None..
         /// </summary>
         None,
+
         /// <summary>
         /// Left grip
         /// </summary>
         Left,
+
         /// <summary>
         /// Right grip
         /// </summary>
         Right,
+
         /// <summary>
         /// Top Grip
         /// </summary>
         Top,
+
         /// <summary>
         /// Bottom grip
         /// </summary>
         Bottom,
+
         /// <summary>
         /// Bottom right corner
         /// </summary>

@@ -10,7 +10,7 @@ namespace FlowGraph
             Pen = new Pen(color);
             Brush = new SolidBrush(Color);
         }
-        
+
         public GraphColor(Color color, Pen pen)
         {
             Color = color;

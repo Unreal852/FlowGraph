@@ -6,7 +6,6 @@ namespace FlowGraph
     {
         public GraphZoom()
         {
-
         }
 
         /// <summary>

@@ -73,7 +73,7 @@ namespace FlowGraph.Nodes.Connectors
             get => m_location;
             set
             {
-                if (m_location == value || m_location.X == value.X && m_location.Y == value.Y)
+                if(m_location == value || m_location.X == value.X && m_location.Y == value.Y)
                     return;
                 m_location = value;
                 UpdateBounds();
@@ -88,7 +88,7 @@ namespace FlowGraph.Nodes.Connectors
             get => m_size;
             set
             {
-                if (m_size == value || m_size.Width == value.Width || m_size.Height == value.Height)
+                if(m_size == value || m_size.Width == value.Width || m_size.Height == value.Height)
                     return;
                 m_size = value;
                 UpdateBounds();
@@ -122,11 +122,11 @@ namespace FlowGraph.Nodes.Connectors
         /// <param name="to">To connector</param>
         public void Connect(NodeConnector to)
         {
-            if (CanConnect(to) && to.CanConnect(this))
+            if(CanConnect(to) && to.CanConnect(this))
             {
                 NodeConnection nodeCon = new NodeConnection(this, to);
                 m_connections.Add(nodeCon);
-                if (Owner is IConnectorHandler)
+                if(Owner is IConnectorHandler)
                     ((IConnectorHandler)Owner).OnConnected(Type, nodeCon);
             }
         }
@@ -137,7 +137,7 @@ namespace FlowGraph.Nodes.Connectors
         /// <param name="connection">Connection</param>
         public void Disconnect(NodeConnection connection)
         {
-            if (m_connections.Contains(connection))
+            if(m_connections.Contains(connection))
                 m_connections.Remove(connection);
             if(Owner is IConnectorHandler)
                 ((IConnectorHandler)Owner).OnDisconnected(Type, connection);
@@ -149,7 +149,7 @@ namespace FlowGraph.Nodes.Connectors
         /// <param name="location">Location</param>
         internal void UpdateBounds(GraphLocation location = null)
         {
-            if (location != null)
+            if(location != null)
                 Location = location;
             Bounds = new Rectangle(Location.X, Location.Y, Size.Width, Size.Height);
             ConnectorBounds = new Rectangle(Location.X - Bounds.Width / 2, Location.Y - Bounds.Height / 2, Size.Width, Size.Height);
@@ -162,14 +162,15 @@ namespace FlowGraph.Nodes.Connectors
         /// <returns><see cref="IElement"/> if a element has been found, <see cref="null"/> otherwise</returns>
         public IElement FindElementAt(Point point)
         {
-            if (ConnectorBounds.Contains(point))
+            if(ConnectorBounds.Contains(point))
                 return this;
-            foreach (NodeConnection connection in m_connections)
+            foreach(NodeConnection connection in m_connections)
             {
                 IElement element = connection.FindElementAt(point);
-                if (element != null)
+                if(element != null)
                     return element;
             }
+
             return null;
         }
 
@@ -178,11 +179,12 @@ namespace FlowGraph.Nodes.Connectors
         /// </summary>
         public void OnRender(ElementRenderEventArgs e)
         {
-            if (Type == ConnectorType.Input)
+            if(Type == ConnectorType.Input)
             {
-                foreach (NodeConnection nc in Connections)
+                foreach(NodeConnection nc in Connections)
                     nc.OnRender(e);
             }
+
             e.Graphics.DrawCircle(OutlineConnectorColor.Pen, Bounds.X, Bounds.Y, 5);
             e.Graphics.FillCircle(ConnectorColor.Brush, Bounds.X, Bounds.Y, 5);
         }
